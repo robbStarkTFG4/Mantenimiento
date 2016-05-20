@@ -6,35 +6,75 @@ import java.util.List;
  * Created by marcoisaac on 5/11/2016.
  */
 public class Equipo {
-    private String nombre;
-    private String id;
-    private List<HistorialDetalles> historialDetallesList;
-    private Lugar linea;
 
-    public Equipo(String nombre, String linea, String id) {
-        this.nombre = nombre;
-        this.id = id;
+    private Integer idequipo;
+    private String numeroEquipo;
+    private int listaNombreEquiposIdlistaNombre;
+    private String codigoBarras;
+    private Lugar lugarIdlugar;
+    private List<Orden> ordenList;
+    private List<InformacionFabricante> informacionFabricanteList;
+
+    public Equipo(String numeroEquipo) {
+        this.numeroEquipo = numeroEquipo;
     }
 
-    public String getNombre() {
-        return nombre;
+    public Equipo() {
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public Integer getIdequipo() {
+        return idequipo;
     }
 
-    public String getId() {
-        return id;
+    public void setIdequipo(Integer idequipo) {
+        this.idequipo = idequipo;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getNumeroEquipo() {
+        return numeroEquipo;
     }
 
-    public Lugar getLinea() {
-        return linea;
+    public void setNumeroEquipo(String numeroEquipo) {
+        this.numeroEquipo = numeroEquipo;
     }
 
+    public Lugar getLugarIdlugar() {
+        return lugarIdlugar;
+    }
 
+    public void setLugarIdlugar(Lugar lugarIdlugar) {
+        this.lugarIdlugar = lugarIdlugar;
+    }
+
+    public int getListaNombreEquiposIdlistaNombre() {
+        return listaNombreEquiposIdlistaNombre;
+    }
+
+    public void setListaNombreEquiposIdlistaNombre(int listaNombreEquiposIdlistaNombre) {
+        this.listaNombreEquiposIdlistaNombre = listaNombreEquiposIdlistaNombre;
+    }
+
+    public String getCodigoBarras() {
+        return codigoBarras;
+    }
+
+    public void setCodigoBarras(String codigoBarras) {
+        this.codigoBarras = codigoBarras;
+    }
+
+    public List<Orden> getOrdenList() {
+        return ordenList;
+    }
+
+    public void setOrdenList(List<Orden> ordenList) {
+        this.ordenList = ordenList;
+    }
+
+    public List<InformacionFabricante> getInformacionFabricanteList() {
+        return informacionFabricanteList;
+    }
+
+    public void setInformacionFabricanteList(List<InformacionFabricante> informacionFabricanteList) {
+        this.informacionFabricanteList = informacionFabricanteList;
+    }
 }

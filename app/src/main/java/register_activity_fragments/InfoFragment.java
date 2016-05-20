@@ -2,8 +2,10 @@ package register_activity_fragments;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +14,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,19 +46,18 @@ public class InfoFragment extends Fragment {
 
     // TODO: Rename and change types of parameters
     private ListaNombreEquipos mParam1;
-    private String mParam2;
+    private List<InformacionFabricante> dataList;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private TextView nombreField;
-    private TextView idField;
-    private TextView lineaField;
+    private EditText numeroField;
 
-    private List<InformacionFabricante> dataList;
-    private Equipo equipo;
+
+    private Equipo equipo = new Equipo();
     private Navigator navigator;
     private OnclickLink link;
+    private RegisterConsumer regCon;
 
     public InfoFragment() {
         // Required empty public constructor
@@ -92,13 +96,12 @@ public class InfoFragment extends Fragment {
         super.onAttach(context);
         navigator = (Navigator) context;
         link = (OnclickLink) context;
+        regCon = (RegisterConsumer) context;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        equipo = new Equipo("Motor", "40", "abcd123");
 
 
         List<InformacionFabricante> filtered = new ArrayList<>();
@@ -131,6 +134,7 @@ public class InfoFragment extends Fragment {
     }
 
     private void widgetSetUp(View view) {
+        numeroField = (EditText) view.findViewById(R.id.info_numero_equipo);
     }
 
     @Override
@@ -145,7 +149,26 @@ public class InfoFragment extends Fragment {
         int id = item.getItemId();
         switch (id) {
             case R.id.enviar_register:
-                Toast.makeText(getContext(), "registrar equipo", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Warn");
+                builder.setMessage("Registrar equipo?");
+                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (numeroField.getText().length() > 0) {
+                            regCon.register(dataList, numeroField.getText().toString());
+                        } else {
+                            Toast.makeText(InfoFragment.this.getContext(), "escribe numero equipo", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //TODO
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -173,8 +196,21 @@ public class InfoFragment extends Fragment {
     }
 
     public void setValor(String valor, int current) {
+        //para cerrar keyboard
+        getActivity().getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        // end cerrar
         dataList.get(current).setValor(valor);
         mAdapter.notifyDataSetChanged();
         Toast.makeText(getContext(), valor, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    public interface RegisterConsumer {
+        public void register(List<InformacionFabricante> infoList, String numeroEquipo);
     }
 }

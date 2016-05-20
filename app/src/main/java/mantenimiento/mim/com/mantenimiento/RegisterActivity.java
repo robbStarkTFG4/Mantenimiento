@@ -17,20 +17,26 @@ import register_activity_fragments.ValueDialogFragment;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import server.MantenimientoAPI;
+import server.RegisterAPI;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.SerialListHolder;
+import util.navigation.modelos.Equipo;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.ListaNombreEquipos;
 
 public class RegisterActivity extends AppCompatActivity implements Navigator, ValueDialogFragment.ValueDialogConsumer
         , OnclickLink, ProduceCodeFragment.BarcodeConsumer
-        , ChooseLineFragment.LineConsumer {
+        , ChooseLineFragment.LineConsumer, InfoFragment.RegisterConsumer {
 
     private ListaNombreEquipos nombreEquipo;
-    private int current;
+    private String barCode;
+    private String lineName;
+
     private SerialListHolder holder;
+    private int current;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
     private void loadFactoryParams() {
         final ProgressDialog prog = new ProgressDialog(this);
         prog.setMessage("cargando...");
-        MantenimientoAPI service = MantenimientoAPI.Factory.getInstance();
+        RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.registerFactoryParams(this.nombreEquipo.getIdlistaNombre(), new Callback<List<InformacionFabricante>>() {
             @Override
             public void success(List<InformacionFabricante> informacionFabricantes, Response response) {
@@ -115,7 +121,6 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
     @Override
     public void tipoEquipo(ListaNombreEquipos tip) {
         this.nombreEquipo = tip;
-        Toast.makeText(this, tip.getNombre(), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -125,7 +130,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
      */
     @Override
     public void barCodeResult(String code) {
-        Toast.makeText(this, code, Toast.LENGTH_SHORT).show();
+        this.barCode = code;
     }
 
     /**
@@ -135,7 +140,57 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
      */
     @Override
     public void consumeLine(String name) {
-        Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
+        this.lineName = name;
     }
 
+    @Override
+    public void register(final List<InformacionFabricante> infoList, String numeroEquipo) {
+        /*private ListaNombreEquipos nombreEquipo;
+        private String barCode;
+        private String lineName;*/
+        Equipo equipo = new Equipo();
+        equipo.setNumeroEquipo(numeroEquipo);
+        equipo.setCodigoBarras(barCode);
+        equipo.setListaNombreEquiposIdlistaNombre(nombreEquipo.getIdlistaNombre());
+        //equipo.setInformacionFabricanteList(infoList);
+
+        for (int i = 0; i < infoList.size(); i++) {
+            Toast.makeText(this, infoList.get(i).getParametro(), Toast.LENGTH_SHORT).show();
+        }
+
+        final ProgressDialog pg = new ProgressDialog(this);
+        pg.setMessage("registrando espere....");
+
+        RegisterAPI service = RegisterAPI.Factory.getInstance();
+        service.registerEquipment(lineName, equipo, new Callback<Equipo>() {
+            @Override
+            public void success(Equipo equipo, Response response) {
+                //Toast.makeText(RegisterActivity.this, "registrado exitosamente: " + equipo.getIdequipo(), Toast.LENGTH_LONG).show();
+                registratInfoFabricante(equipo.getIdequipo(), infoList,pg);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                pg.dismiss();
+                Toast.makeText(RegisterActivity.this, "falla al registrar", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void registratInfoFabricante(Integer idequipo, final List<InformacionFabricante> infoList,final  ProgressDialog pg) {
+        RegisterAPI service = RegisterAPI.Factory.getInstance();
+        service.registerFactoryParams(idequipo, infoList, new Callback<InformacionFabricante>() {
+            @Override
+            public void success(InformacionFabricante o, Response response) {
+                pg.dismiss();
+                Toast.makeText(RegisterActivity.this, "registrado exitosamente: ", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                pg.dismiss();
+                Toast.makeText(RegisterActivity.this, "falla al registrar inf", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }

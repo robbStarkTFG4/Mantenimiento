@@ -84,7 +84,7 @@ public class EquipmentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        equipo = new Equipo("Motor", "40", "abcd123");
+        //equipo = new Equipo("Motor", "40", "abcd123");
 
         dataList = new ArrayList<>();
         dataList.add(new HistorialDetalles("Amperaje", "45A"));
@@ -109,12 +109,12 @@ public class EquipmentFragment extends Fragment {
             }
         });
 
-        nombreField = (TextView) view.findViewById(R.id.nombreField);
+        /*nombreField = (TextView) view.findViewById(R.id.nombreField);
         nombreField.setText(equipo.getNombre());
         idField = (TextView) view.findViewById(R.id.idField);
         idField.setText(equipo.getId());
         lineaField = (TextView) view.findViewById(R.id.lineaField);
-        lineaField.setText(equipo.getLinea().getNombre());
+        lineaField.setText(equipo.getLinea().getNombre());*/
     }
 
     private void recyclerSetUp(View view) {

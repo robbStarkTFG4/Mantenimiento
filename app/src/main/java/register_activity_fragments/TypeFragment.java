@@ -20,7 +20,7 @@ import mantenimiento.mim.com.mantenimiento.R;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import server.MantenimientoAPI;
+import server.RegisterAPI;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.adapter.TipoAdapter;
@@ -118,7 +118,7 @@ public class TypeFragment extends Fragment implements OnclickLink {
             }
         };
         thread.start();*/
-        MantenimientoAPI service = MantenimientoAPI.Factory.getInstance();
+        RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.getListNombreEquipos(new Callback<List<ListaNombreEquipos>>() {
             @Override
             public void success(List<ListaNombreEquipos> listaNombreEquiposes, Response response) {

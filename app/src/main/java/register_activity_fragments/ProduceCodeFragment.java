@@ -3,7 +3,6 @@ package register_activity_fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,14 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import mantenimiento.mim.com.mantenimiento.R;
 import retrofit.Callback;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import server.MantenimientoAPI;
+import server.RegisterAPI;
 import util.navigation.Navigator;
 
 
@@ -111,12 +108,12 @@ public class ProduceCodeFragment extends Fragment {
         };
         thread.start();*/
       /*  RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(MantenimientoAPI.BASE_URL)
+                .setEndpoint(RegisterAPI.BASE_URL)
                 .build();
 
-        final MantenimientoAPI service =
-                restAdapter.create(MantenimientoAPI.class);*/
-        MantenimientoAPI service = MantenimientoAPI.Factory.getInstance();
+        final RegisterAPI service =
+                restAdapter.create(RegisterAPI.class);*/
+        RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.getBarCode(new Callback<String>() {
             @Override
             public void success(String s, Response response) {

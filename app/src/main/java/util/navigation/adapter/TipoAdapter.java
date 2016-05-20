@@ -31,7 +31,7 @@ public class TipoAdapter extends RecyclerView.Adapter<TipoAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView text;
+        public TextView text;
         private OnclickLink link;
 
         public ViewHolder(View v, OnclickLink link) {
@@ -57,7 +57,10 @@ public class TipoAdapter extends RecyclerView.Adapter<TipoAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(TipoAdapter.ViewHolder holder, int position) {
-        holder.text.setText(dataList.get(position).getNombre());
+        if (dataList != null && dataList.size() > 0) {
+            holder.text.setText(dataList.get(position).getNombre());
+        }
+
     }
 
     @Override
