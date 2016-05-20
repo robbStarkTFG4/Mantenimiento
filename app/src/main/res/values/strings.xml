@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Mantenimiento</string>
+    <string name="menu_leer_codigo">Leer Codigo</string>
+    <string name="registrar">Registrar</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="escribe_valor">escribe valor</string>
+    <string name="aceptar">aceptar</string>
+    <string name="cancelar">cancelar</string>
+    <string name="codigo_barras">Codigo</string>
+</resources>
