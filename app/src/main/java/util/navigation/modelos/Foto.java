@@ -1,9 +1,11 @@
 package util.navigation.modelos;
 
+import java.io.Serializable;
+
 /**
  * Created by marcoisaac on 5/12/2016.
  */
-public class Foto {
+public class Foto implements Serializable {
     private int id;
     private String path;
     private String titulo;

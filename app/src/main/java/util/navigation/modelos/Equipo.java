@@ -1,11 +1,12 @@
 package util.navigation.modelos;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by marcoisaac on 5/11/2016.
  */
-public class Equipo {
+public class Equipo implements Serializable {
 
     private Integer idequipo;
     private String numeroEquipo;
@@ -17,6 +18,12 @@ public class Equipo {
 
     public Equipo(String numeroEquipo) {
         this.numeroEquipo = numeroEquipo;
+    }
+
+    public Equipo(String numeroEquipo, String codigoBarras, int listaNombreEquiposIdlistaNombre) {
+        this.numeroEquipo = numeroEquipo;
+        this.codigoBarras = codigoBarras;
+        this.listaNombreEquiposIdlistaNombre = listaNombreEquiposIdlistaNombre;
     }
 
     public Equipo() {

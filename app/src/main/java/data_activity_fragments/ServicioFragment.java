@@ -1,6 +1,7 @@
 package data_activity_fragments;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Navigator;
+import util.navigation.SerialListHolder;
 import util.navigation.adapter.ServiceAdapter;
 import util.navigation.modelos.HistorialDetalles;
 
@@ -44,6 +46,7 @@ public class ServicioFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private List<HistorialDetalles> dataList;
+    private HistoryConsumer consumer;
 
     public ServicioFragment() {
         // Required empty public constructor
@@ -58,11 +61,10 @@ public class ServicioFragment extends Fragment {
      * @return A new instance of fragment ServicioFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ServicioFragment newInstance(String param1, String param2, Navigator navigator) {
+    public static ServicioFragment newInstance(SerialListHolder param1, String param2) {
         ServicioFragment fragment = new ServicioFragment();
-        fragment.setNavigator(navigator);
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putSerializable(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -72,7 +74,7 @@ public class ServicioFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            dataList = ((SerialListHolder) getArguments().getSerializable(ARG_PARAM1)).getHistoryList();
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
@@ -82,12 +84,16 @@ public class ServicioFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        dataList = new ArrayList<>();
-        dataList.add(new HistorialDetalles("Corriente: "));
-        dataList.add(new HistorialDetalles("Comentario: "));
+
         View view = inflater.inflate(R.layout.fragment_servicio, container, false);
         recyclerSetUp(view);
         return view;
+    }
+
+    private void testData() {
+        dataList = new ArrayList<>();
+        dataList.add(new HistorialDetalles("Corriente: "));
+        dataList.add(new HistorialDetalles("Comentario: "));
     }
 
     private void recyclerSetUp(View view) {
@@ -135,6 +141,8 @@ public class ServicioFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Toast.makeText(getContext(), "Enviando...", Toast.LENGTH_LONG).show();
+                                consumer.consume(dataList);
+                                consumer.upload();
                             }
                         }).create();
                 alert.show();
@@ -143,7 +151,18 @@ public class ServicioFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setNavigator(Navigator navigator) {
-        this.navigator = navigator;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Navigator) {
+            navigator = (Navigator) context;
+            consumer = (HistoryConsumer) context;
+        }
+    }
+
+    public interface HistoryConsumer {
+        public void consume(List<HistorialDetalles> list);
+
+        public void upload();
     }
 }

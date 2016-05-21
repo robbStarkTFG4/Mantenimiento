@@ -13,6 +13,11 @@ public class InformacionFabricante implements Serializable {
     private String valor;
     private Equipo equipoIdequipo;
 
+    public InformacionFabricante(String parametro, String valor) {
+        this.parametro = parametro;
+        this.valor = valor;
+    }
+
     public InformacionFabricante(String parametro) {
         this.parametro = parametro;
     }

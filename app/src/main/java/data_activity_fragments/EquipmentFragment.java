@@ -1,6 +1,7 @@
 package data_activity_fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -17,9 +18,11 @@ import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Navigator;
+import util.navigation.SerialListHolder;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.HistorialDetalles;
 import util.navigation.adapter.DataAdapter;
+import util.navigation.modelos.InformacionFabricante;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,10 +34,12 @@ public class EquipmentFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private Equipo equipo;
     private String mParam2;
+    private List<InformacionFabricante> infList;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -43,8 +48,6 @@ public class EquipmentFragment extends Fragment {
     private TextView idField;
     private TextView lineaField;
 
-    private List<HistorialDetalles> dataList;
-    private Equipo equipo;
     private FloatingActionButton floatButton;
     private Navigator navigator;
 
@@ -61,12 +64,12 @@ public class EquipmentFragment extends Fragment {
      * @return A new instance of fragment EquipmentFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static EquipmentFragment newInstance(String param1, String param2, Navigator navigator) {
+    public static EquipmentFragment newInstance(Equipo param1, String param2, SerialListHolder holder) {
         EquipmentFragment fragment = new EquipmentFragment();
-        fragment.setNavigator(navigator);
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putSerializable(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PARAM3, holder);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,8 +78,9 @@ public class EquipmentFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            equipo = (Equipo) getArguments().getSerializable(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            infList = ((SerialListHolder) getArguments().getSerializable(ARG_PARAM3)).getInformacionFabricantes();
         }
     }
 
@@ -84,12 +88,6 @@ public class EquipmentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //equipo = new Equipo("Motor", "40", "abcd123");
-
-        dataList = new ArrayList<>();
-        dataList.add(new HistorialDetalles("Amperaje", "45A"));
-        dataList.add(new HistorialDetalles("Voltaje", "240V/440V"));
-        dataList.add(new HistorialDetalles("Nema", "VII"));
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_equipment, container, false);
 
@@ -99,25 +97,35 @@ public class EquipmentFragment extends Fragment {
         return view;
     }
 
+    private void testData() {
+        equipo = new Equipo("Motor", "40", 2);
+
+        infList = new ArrayList<>();
+        infList.add(new InformacionFabricante("Amperaje", "45A"));
+        infList.add(new InformacionFabricante("Voltaje", "240V/440V"));
+        infList.add(new InformacionFabricante("Nema", "VII"));
+    }
+
     private void widgetSetUp(View view) {
         floatButton = (FloatingActionButton) view.findViewById(R.id.fab);
         floatButton.setOnClickListener(new FloatingActionButton.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "dasdasdas", Toast.LENGTH_LONG).show();
                 navigator.navigate("orden");
             }
         });
 
-        /*nombreField = (TextView) view.findViewById(R.id.nombreField);
-        nombreField.setText(equipo.getNombre());
+        nombreField = (TextView) view.findViewById(R.id.nombreField);
+        nombreField.setText(mParam2);
         idField = (TextView) view.findViewById(R.id.idField);
-        idField.setText(equipo.getId());
+        idField.setText(equipo.getNumeroEquipo());
         lineaField = (TextView) view.findViewById(R.id.lineaField);
-        lineaField.setText(equipo.getLinea().getNombre());*/
+        lineaField.setText(equipo.getLugarIdlugar().getNombre());
     }
 
     private void recyclerSetUp(View view) {
+
+        //Toast.makeText(getContext(), infList.get(0).getParametro() + " " + infList.get(0).getValor(), Toast.LENGTH_LONG).show();
         mRecyclerView = (RecyclerView) view.findViewById(R.id.generales);
 
         // use this setting to improve performance if you know that changes
@@ -129,11 +137,25 @@ public class EquipmentFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new DataAdapter(dataList);
+        mAdapter = new DataAdapter(infList);
         mRecyclerView.setAdapter(mAdapter);
     }
 
     public void setNavigator(Navigator navigator) {
         this.navigator = navigator;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Navigator) {
+            navigator = (Navigator) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        navigator = null;
     }
 }

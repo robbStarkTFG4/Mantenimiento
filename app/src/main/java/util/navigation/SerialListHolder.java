@@ -3,6 +3,7 @@ package util.navigation;
 import java.io.Serializable;
 import java.util.List;
 
+import util.navigation.modelos.HistorialDetalles;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.Lugar;
 
@@ -12,6 +13,7 @@ import util.navigation.modelos.Lugar;
 public class SerialListHolder implements Serializable {
     private List<Lugar> list;
     private List<InformacionFabricante> informacionFabricantes;
+    private List<HistorialDetalles> historyList;
 
     public SerialListHolder(List<Lugar> list) {
         this.list = list;
@@ -34,5 +36,13 @@ public class SerialListHolder implements Serializable {
 
     public void setInformacionFabricantes(List<InformacionFabricante> informacionFabricantes) {
         this.informacionFabricantes = informacionFabricantes;
+    }
+
+    public List<HistorialDetalles> getHistoryList() {
+        return historyList;
+    }
+
+    public void setHistoryList(List<HistorialDetalles> historyList) {
+        this.historyList = historyList;
     }
 }

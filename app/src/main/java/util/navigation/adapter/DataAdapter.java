@@ -11,12 +11,13 @@ import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.modelos.HistorialDetalles;
+import util.navigation.modelos.InformacionFabricante;
 
 /**
  * Created by marcoisaac on 5/11/2016.
  */
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
-    private List<HistorialDetalles> mDataset;
+    private List<InformacionFabricante> mDataset;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -31,7 +32,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         }
     }
 
-    public DataAdapter(List<HistorialDetalles> myDataset) {
+    public DataAdapter(List<InformacionFabricante> myDataset) {
         mDataset = myDataset;
     }
 

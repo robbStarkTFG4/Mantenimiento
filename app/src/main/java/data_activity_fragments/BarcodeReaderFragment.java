@@ -2,6 +2,7 @@ package data_activity_fragments;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,14 +11,25 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.List;
+
 import mantenimiento.mim.com.mantenimiento.R;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import server.OrdenAPI;
 import util.navigation.Navigator;
+import util.navigation.modelos.Equipo;
+import util.navigation.modelos.HistorialDetalles;
+import util.navigation.modelos.InformacionFabricante;
+import util.navigation.modelos.ListaNombreEquipos;
 
 
 public class BarcodeReaderFragment extends Fragment {
@@ -45,6 +57,11 @@ public class BarcodeReaderFragment extends Fragment {
     });
 
     private Navigator navigator;
+    private EquipmentConsumer consumer;
+    private TextView manual;
+    private EditText manualField;
+
+    private int idTipo;
 
     public BarcodeReaderFragment() {
         // Required empty public constructor
@@ -61,7 +78,6 @@ public class BarcodeReaderFragment extends Fragment {
     // TODO: Rename and change types and number of parameters
     public static BarcodeReaderFragment newInstance(String param1, String param2, Navigator navigator) {
         BarcodeReaderFragment fragment = new BarcodeReaderFragment();
-        fragment.setNavigator(navigator);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -92,6 +108,19 @@ public class BarcodeReaderFragment extends Fragment {
                 equipmentForm();
             }
         });
+        manualField = (EditText) view.findViewById(R.id.manual_field);
+        manual = (TextView) view.findViewById(R.id.manual);
+        manual.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String res = manualField.getText().toString();
+                if (res.length() > 0) {
+                    searchEquipment(res);
+                } else {
+                    Toast.makeText(getContext(), "escribe codigo", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         barcodeReader();
 
@@ -117,12 +146,7 @@ public class BarcodeReaderFragment extends Fragment {
                 toast = "Cancelado";
             } else {
                 toast = "Codigo: " + result.getContents();
-                dialog = new ProgressDialog(getContext());
-                dialog.setCanceledOnTouchOutside(false);
-                dialog.setTitle("Loading");
-                dialog.setMessage("Espera un momento");
-                dialog.show();
-                Thread thread = new Thread() {
+                /*Thread thread = new Thread() {
                     @Override
                     public void run() {
                         try {
@@ -133,19 +157,100 @@ public class BarcodeReaderFragment extends Fragment {
                         }
                     }
                 };
-                thread.start();
-
+                thread.start();*/
+                String res = result.getContents();
+                searchEquipment(res);
             }
 
             // At this point we may or may not have a reference to the activity
-            displayToast(toast);
+            //displayToast(toast);
         }
+    }
+
+    private void searchEquipment(String res) {
+        dialog = new ProgressDialog(getContext());
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setTitle("Loading");
+        dialog.setMessage("Espera un momento");
+        dialog.show();
+        OrdenAPI service = OrdenAPI.Factory.getInstance();
+        service.getEquipmentByCodeBar(res, new Callback<Equipo>() {
+
+
+            @Override
+            public void success(Equipo equipo, Response response) {
+                consumer.consumeEquipment(equipo);
+                BarcodeReaderFragment.this.idTipo = equipo.getListaNombreEquiposIdlistaNombre();
+                //Toast.makeText(getContext(), "numero: " + BarcodeReaderFragment.this.idTipo, Toast.LENGTH_SHORT).show();
+                getFactoryList(dialog, equipo.getIdequipo());
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                dialog.dismiss();
+                Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void getFactoryList(final ProgressDialog dialog, final Integer idequipo) {
+        OrdenAPI service = OrdenAPI.Factory.getInstance();
+        service.getFactoryList(idequipo, new Callback<List<InformacionFabricante>>() {
+            @Override
+            public void success(List<InformacionFabricante> informacionFabricantes, Response response) {
+                //dialog.dismiss();
+                getHistorialDetalles(dialog, idequipo);
+                consumer.consumeFactoryList(informacionFabricantes);
+                //Toast.makeText(getContext(), "exito " + informacionFabricantes.get(0).getParametro(), Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                dialog.dismiss();
+                Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void getHistorialDetalles(final ProgressDialog dialog, final Integer idequipo) {
+        OrdenAPI service = OrdenAPI.Factory.getInstance();
+        service.getHistorialDetalles(idequipo, new Callback<List<HistorialDetalles>>() {
+            @Override
+            public void success(List<HistorialDetalles> historialDetalles, Response response) {
+                consumer.consumeHistoryList(historialDetalles);
+                retrieveNombre(dialog, idTipo);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                dialog.dismiss();
+                Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void retrieveNombre(final ProgressDialog dialog, Integer idTipo) {
+        OrdenAPI service = OrdenAPI.Factory.getInstance();
+        service.getNombreEquipo(idTipo, new Callback<ListaNombreEquipos>() {
+            @Override
+            public void success(ListaNombreEquipos s, Response response) {
+                dialog.dismiss();
+                consumer.consumeNombreEquipo(s.getNombre());
+                navigator.navigate("equipo");
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                dialog.dismiss();
+                Toast.makeText(getContext(), "hubo algun error nombre tipo ", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void equipmentForm() {
         if (navigator != null) {
             Toast.makeText(getContext(), "Action", Toast.LENGTH_LONG).show();
-            if(dialog!=null) {
+            if (dialog != null) {
                 dialog.dismiss();
             }
             navigator.navigate("equipo");
@@ -159,8 +264,31 @@ public class BarcodeReaderFragment extends Fragment {
         Toast.makeText(getContext(), toast, Toast.LENGTH_LONG).show();
     }
 
-    public void setNavigator(Navigator navigator) {
-        this.navigator = navigator;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Navigator) {
+            navigator = (Navigator) context;
+            consumer = (EquipmentConsumer) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        consumer = null;
+        navigator = null;
+    }
+
+    public interface EquipmentConsumer {
+        public void consumeEquipment(Equipo equipo);
+
+        public void consumeFactoryList(List<InformacionFabricante> list);
+
+        public void consumeHistoryList(List<HistorialDetalles> list);
+
+        public void consumeNombreEquipo(String nombre);
     }
 }
 

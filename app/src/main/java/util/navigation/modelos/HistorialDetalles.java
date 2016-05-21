@@ -1,9 +1,11 @@
 package util.navigation.modelos;
 
+import java.io.Serializable;
+
 /**
  * Created by marcoisaac on 5/11/2016.
  */
-public class HistorialDetalles {
+public class HistorialDetalles implements Serializable {
     private Integer idhistorialDetalles;
     private String parametro;
     private String valor;

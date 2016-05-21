@@ -9,10 +9,12 @@ import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import util.navigation.modelos.Equipo;
+import util.navigation.modelos.HistorialDetalles;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.ListaNombreEquipos;
 
-/** Service used to register an equipment into the DB
+/**
+ * Service used to register an equipment into the DB
  * Created by marcoisaac on 5/19/2016.
  */
 public interface OrdenAPI {
@@ -36,4 +38,15 @@ public interface OrdenAPI {
         }
     }
 
+    @GET("/com.mim.entities.equipo/{code}")
+    public void getEquipmentByCodeBar(@Path("code") String codigo, Callback<Equipo> cb);
+
+    @GET("/com.mim.entities.informacionfabricante/factoryList/{id}")
+    public void getFactoryList(@Path("id") int equipoId, Callback<List<InformacionFabricante>> cb);
+
+    @GET("/com.mim.entities.historialdetalles/history/{id}")
+    public void getHistorialDetalles(@Path("id") int idEquipo, Callback<List<HistorialDetalles>> cb);
+
+    @GET("/com.mim.entities.listanombreequipos/nombre/{id}")
+    public void getNombreEquipo(@Path("id") int id, Callback<ListaNombreEquipos> cb);
 }

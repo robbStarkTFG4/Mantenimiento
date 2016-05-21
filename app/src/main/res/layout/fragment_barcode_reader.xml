@@ -6,23 +6,35 @@
     tools:context="data_activity_fragments.BarcodeReaderFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:textSize="20dp"
+    <EditText
+        android:id="@+id/manual_field"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="Codigo No Encontrado"
+        android:hint="Escribe Codigo"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/manual"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/manual_field"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="7dp"
+        android:text="Siguiente"
+        android:textColor="@color/button_color"
+        android:textSize="30dp" />
 
 
     <TextView
         android:id="@+id/reintentar"
-        android:textColor="@color/button_color"
-        android:textSize="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:text="Reintentar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:textColor="@color/button_color"
+        android:textSize="30dp" />
 
 </RelativeLayout>

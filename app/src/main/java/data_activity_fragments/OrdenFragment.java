@@ -8,14 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Navigator;
+import util.navigation.modelos.Orden;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OrdenFragment.OnFragmentInteractionListener} interface
+ * {@link OrdenConsumer} interface
  * to handle interaction events.
  * Use the {@link OrdenFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -31,6 +34,7 @@ public class OrdenFragment extends Fragment {
     private String mParam2;
 
     private Navigator mListener;
+    private OrdenConsumer orderConsumer;
 
     public OrdenFragment() {
         // Required empty public constructor
@@ -68,14 +72,36 @@ public class OrdenFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_orden, container, false);
+        widgetSetUp(view);
+        return view;
+    }
+
+    private void widgetSetUp(View view) {
+
+        final EditText numeroOrden = (EditText) view.findViewById(R.id.numero_orden);
+        final EditText descripcion = (EditText) view.findViewById(R.id.descripcion_orden);
+        final EditText encargado = (EditText) view.findViewById(R.id.encargado_orden);
+
         Button btn = (Button) view.findViewById(R.id.siguiente_orden);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.navigate("servicio");
+                if (numeroOrden.getText().length() > 0 && encargado.getText().length() > 0 && descripcion.getText().length() > 0) {
+                    createOrden(numeroOrden.getText().toString(), descripcion.getText().toString(), encargado.getText().toString());
+                    mListener.navigate("servicio");
+                }else{
+                    Toast.makeText(getContext(),"llena todos los datos",Toast.LENGTH_LONG).show();
+                }
             }
         });
-        return view;
+    }
+
+    private void createOrden(String numeroOrden, String encargado, String descripcion) {
+        Orden orden = new Orden();
+        orden.setDescripcion(descripcion);
+        orden.setEncargado(encargado);
+        orden.setNumeroOrden(numeroOrden);
+        orderConsumer.consumeOrden(orden);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -86,6 +112,7 @@ public class OrdenFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof Navigator) {
             mListener = (Navigator) context;
+            orderConsumer = (OrdenConsumer) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement Navigator");
@@ -96,6 +123,7 @@ public class OrdenFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        orderConsumer = null;
     }
 
     /**
@@ -108,8 +136,8 @@ public class OrdenFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OrdenConsumer {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        public void consumeOrden(Orden orden);
     }
 }
