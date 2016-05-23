@@ -106,7 +106,7 @@ public class FotosAdapter extends RecyclerView.Adapter<FotosAdapter.ViewHolder> 
             //holder.image.setImageDrawable(context.getDrawable(camarita));
         }
 
-        File fil = new File(foto.getPath());//
+        File fil = new File(foto.getArchivo());//
         if (fil.exists()) {
             Toast.makeText(context, "si existe el archivo", Toast.LENGTH_LONG).show();
             Picasso.with(context).load(fil).

@@ -4,14 +4,21 @@ import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.Part;
 import retrofit.http.Path;
+import retrofit.mime.TypedFile;
+import retrofit.mime.TypedString;
 import util.navigation.modelos.Equipo;
+import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.ListaNombreEquipos;
+import util.navigation.modelos.Orden;
 
 /**
  * Service used to register an equipment into the DB
@@ -38,6 +45,7 @@ public interface OrdenAPI {
         }
     }
 
+    // FOR RETRIEVE DATA
     @GET("/com.mim.entities.equipo/{code}")
     public void getEquipmentByCodeBar(@Path("code") String codigo, Callback<Equipo> cb);
 
@@ -49,4 +57,20 @@ public interface OrdenAPI {
 
     @GET("/com.mim.entities.listanombreequipos/nombre/{id}")
     public void getNombreEquipo(@Path("id") int id, Callback<ListaNombreEquipos> cb);
+
+    // DATA PERSIST
+
+    @POST("/com.mim.entities.orden/sube")
+    public void persistOrder(@Body Orden orden, Callback<Orden> cb);
+
+    @POST("/com.mim.entities.historialdetalles/lista/{orden}")
+    public void persistHistoryList(@Path("orden") int orden, @Body List<HistorialDetalles> historyList, Callback<HistorialDetalles> cb);
+
+    @POST("/com.mim.entities.fotos/objetos/{id}")
+    public void persistPhotoObjects(@Path("id") int id, @Body List<Foto> list, Callback<Foto> cb);
+
+    //upload picture
+    @Multipart
+    @POST("/com.mim.entities.fotos/prime")
+    public Response uploadImage2(@Part("id") TypedString description, @Part("file") TypedFile imagen);
 }

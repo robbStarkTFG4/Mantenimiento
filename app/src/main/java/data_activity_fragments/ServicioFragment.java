@@ -3,8 +3,11 @@ package data_activity_fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,12 +17,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
+import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.SerialListHolder;
 import util.navigation.adapter.ServiceAdapter;
@@ -90,11 +95,6 @@ public class ServicioFragment extends Fragment {
         return view;
     }
 
-    private void testData() {
-        dataList = new ArrayList<>();
-        dataList.add(new HistorialDetalles("Corriente: "));
-        dataList.add(new HistorialDetalles("Comentario: "));
-    }
 
     private void recyclerSetUp(View view) {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.parametros_servicio);
@@ -115,7 +115,10 @@ public class ServicioFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.servicio_menu, menu);
+        Modifier.changeMenuItemColor(menu);
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -127,7 +130,6 @@ public class ServicioFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.fotos:
-                Toast.makeText(getContext(), "funciona boton fotos", Toast.LENGTH_LONG).show();
                 navigator.navigate("fotos");
                 break;
             case R.id.enviar:
@@ -140,7 +142,6 @@ public class ServicioFragment extends Fragment {
                         .setPositiveButton("aceptar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getContext(), "Enviando...", Toast.LENGTH_LONG).show();
                                 consumer.consume(dataList);
                                 consumer.upload();
                             }

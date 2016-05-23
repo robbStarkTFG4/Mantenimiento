@@ -14,6 +14,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +40,7 @@ import util.navigation.modelos.Foto;
 public class CameraFragment extends Fragment implements FotosAdapter.PositionConsumer {
     @Override
     public void position(int position) {
-        ImageViewFragment dialog = ImageViewFragment.newInstance(dataList.get(position).getPath(), null);
+        ImageViewFragment dialog = ImageViewFragment.newInstance(dataList.get(position).getArchivo(), null);
         dialog.show(getFragmentManager(), "imgDialog");
     }
     // TODO: Rename parameter arguments, choose names that match
@@ -119,6 +121,15 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         widgetSetUp(view);
         dataSetUp();
         recyclerSetUp(view);
+
+        InputMethodManager inputManager = (InputMethodManager) getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        // check if no view has focus:
+
+        inputManager.hideSoftInputFromWindow(container.getWindowToken(), 0);
+
+
         return view;
     }
 
@@ -231,7 +242,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
 
     public void setPhotoInfo(String title, String descripcion) {
         Foto current = new Foto();
-        current.setPath(ruta);
+        current.setArchivo(ruta);
         current.setTitulo(title);
         current.setDescripcion(descripcion);
         dataList.add(current);

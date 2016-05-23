@@ -3,8 +3,12 @@ package register_activity_fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
+import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.SerialListHolder;
@@ -141,6 +146,8 @@ public class InfoFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.register_menu, menu);
+        //PARA CAMBIAR DE COLOR LOS MENU_ITEM
+        Modifier.changeMenuItemColor(menu);
     }
 
     @Override
@@ -202,7 +209,6 @@ public class InfoFragment extends Fragment {
         // end cerrar
         dataList.get(current).setValor(valor);
         mAdapter.notifyDataSetChanged();
-        Toast.makeText(getContext(), valor, Toast.LENGTH_LONG).show();
     }
 
     @Override

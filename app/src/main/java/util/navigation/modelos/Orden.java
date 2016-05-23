@@ -13,7 +13,25 @@ public class Orden implements Serializable {
     private String numeroOrden;
     private String encargado;
     private Equipo equipoIdequipo;
+    private String prioridad;
+    private String actividad;
     private List<HistorialDetalles> historialDetallesList;
+
+    public String getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(String prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public String getActividad() {
+        return actividad;
+    }
+
+    public void setActividad(String actividad) {
+        this.actividad = actividad;
+    }
 
     public Orden(Integer idorden) {
         this.idorden = idorden;

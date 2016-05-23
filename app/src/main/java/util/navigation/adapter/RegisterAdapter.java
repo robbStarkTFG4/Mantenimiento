@@ -84,7 +84,13 @@ public class RegisterAdapter extends RecyclerView.Adapter<RegisterAdapter.ViewHo
                     ((TextView) v).setText(mDataset.get(position).getParametro());
                     break;
                 case R.id.valor_register:
-                    ((TextView) v).setText(mDataset.get(position).getValor());
+
+                    String valor = mDataset.get(position).getValor();
+                    if (valor != null) {
+                        ((TextView) v).setText(valor);
+                    } else {
+                        ((TextView) v).setText("click para agregar");
+                    }
                     break;
             }
 

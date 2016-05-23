@@ -44,6 +44,8 @@ public class ChooseLineFragment extends Fragment {
     private LineDialogFragment dialog;
     private Button btn;
     private LineConsumer lineConsumer;
+    private String nombre = null;
+    private boolean control=false;
 
     public ChooseLineFragment() {
         // Required empty public constructor
@@ -82,6 +84,12 @@ public class ChooseLineFragment extends Fragment {
         // Inflate the layout for this fragment
         dataSetUp();
         View view = inflater.inflate(R.layout.fragment_choose_line, container, false);
+        widgetSetUp(view);
+
+        return view;
+    }
+
+    private void widgetSetUp(View view) {
         btn = (Button) view.findViewById(R.id.choose_line_register);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,18 +103,19 @@ public class ChooseLineFragment extends Fragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.navigate("tipo");
+                if (control) {
+                    mListener.navigate("tipo");
+                }
             }
         });
-
-        return view;
     }
 
     private void dataSetUp() {
         dataList = new ArrayList<>();
         dataList.add(new Lugar("linea 10"));
-        dataList.add(new Lugar("linea 20"));
         dataList.add(new Lugar("linea 30"));
+        dataList.add(new Lugar("linea 40"));
+        dataList.add(new Lugar("linea 50"));
         dataList.add(new Lugar("linea 60"));
     }
 
@@ -115,7 +124,7 @@ public class ChooseLineFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof Navigator) {
             mListener = (Navigator) context;
-            lineConsumer=(LineConsumer)context;
+            lineConsumer = (LineConsumer) context;
             link = (OnclickLink) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -127,11 +136,14 @@ public class ChooseLineFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        lineConsumer = null;
+        link = null;
     }
 
     public void setSelectedLine(int selectedLine) {
+        control=true;
         dialog.dismiss();
-        String nombre = dataList.get(selectedLine).getNombre();
+        nombre = dataList.get(selectedLine).getNombre();
         btn.setText(nombre);
         lineConsumer.consumeLine(nombre);
     }

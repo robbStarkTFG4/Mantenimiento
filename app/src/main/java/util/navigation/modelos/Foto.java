@@ -6,34 +6,27 @@ import java.io.Serializable;
  * Created by marcoisaac on 5/12/2016.
  */
 public class Foto implements Serializable {
-    private int id;
-    private String path;
+    private Integer idfotos;
     private String titulo;
     private String descripcion;
+    private String archivo;
+    private Orden ordenIdorden;;
 
     public Foto() {
     }
 
-    public Foto(String path, String titulo, String descripcion) {
-        this.path = path;
+    public Foto(String archivo, String titulo, String descripcion) {
+        this.archivo = archivo;
         this.titulo = titulo;
         this.descripcion = descripcion;
     }
 
-    public int getId() {
-        return id;
+    public Integer getIdfotos() {
+        return idfotos;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
+    public void setIdfotos(Integer idfotos) {
+        this.idfotos = idfotos;
     }
 
     public String getTitulo() {
@@ -50,5 +43,21 @@ public class Foto implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public Orden getOrdenIdorden() {
+        return ordenIdorden;
+    }
+
+    public void setOrdenIdorden(Orden ordenIdorden) {
+        this.ordenIdorden = ordenIdorden;
+    }
+
+    public String getArchivo() {
+        return archivo;
+    }
+
+    public void setArchivo(String archivo) {
+        this.archivo = archivo;
     }
 }

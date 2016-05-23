@@ -187,7 +187,6 @@ public class TypeFragment extends Fragment implements OnclickLink {
 
     @Override
     public void position(int pos) {
-        Toast.makeText(getContext(), list.get(pos).getNombre(), Toast.LENGTH_LONG).show();
         navigator.tipoEquipo(list.get(pos));
         navigator.navigate("info");
     }

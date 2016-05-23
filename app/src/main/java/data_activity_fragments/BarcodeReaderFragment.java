@@ -104,8 +104,8 @@ public class BarcodeReaderFragment extends Fragment {
         reintentar.setOnClickListener(new TextView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //barcodeReader(); descomentar esto despues
-                equipmentForm();
+                barcodeReader();
+                //equipmentForm();
             }
         });
         manualField = (EditText) view.findViewById(R.id.manual_field);

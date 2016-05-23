@@ -92,6 +92,12 @@ public class FotoDialogFragment extends DialogFragment {
         consumer = (DialogConsumer) activity;
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        consumer=null;
+    }
+
     private void controlSetUp(View view) {
         final EditText titleField = (EditText) view.findViewById(R.id.titleDialog);
         final EditText descriptionField = (EditText) view.findViewById(R.id.descriptionDialog);

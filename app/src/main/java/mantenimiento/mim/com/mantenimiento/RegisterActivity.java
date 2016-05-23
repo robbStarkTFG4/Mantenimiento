@@ -1,6 +1,7 @@
 package mantenimiento.mim.com.mantenimiento;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.multidex.MultiDex;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +36,6 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
 
     private SerialListHolder holder;
     private int current;
-
 
 
     @Override
@@ -84,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
                 holder = new SerialListHolder();
                 holder.setInformacionFabricantes(informacionFabricantes);
                 navigateToInf(RegisterActivity.this.getSupportFragmentManager());
-                Toast.makeText(RegisterActivity.this, informacionFabricantes.get(0).getParametro(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(RegisterActivity.this, informacionFabricantes.get(0).getParametro(), Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -154,10 +154,6 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
         equipo.setListaNombreEquiposIdlistaNombre(nombreEquipo.getIdlistaNombre());
         //equipo.setInformacionFabricanteList(infoList);
 
-        for (int i = 0; i < infoList.size(); i++) {
-            Toast.makeText(this, infoList.get(i).getParametro(), Toast.LENGTH_SHORT).show();
-        }
-
         final ProgressDialog pg = new ProgressDialog(this);
         pg.setMessage("registrando espere....");
 
@@ -166,7 +162,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
             @Override
             public void success(Equipo equipo, Response response) {
                 //Toast.makeText(RegisterActivity.this, "registrado exitosamente: " + equipo.getIdequipo(), Toast.LENGTH_LONG).show();
-                registratInfoFabricante(equipo.getIdequipo(), infoList,pg);
+                registratInfoFabricante(equipo.getIdequipo(), infoList, pg);
             }
 
             @Override
@@ -177,13 +173,17 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
         });
     }
 
-    private void registratInfoFabricante(Integer idequipo, final List<InformacionFabricante> infoList,final  ProgressDialog pg) {
+    private void registratInfoFabricante(Integer idequipo, final List<InformacionFabricante> infoList, final ProgressDialog pg) {
         RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.registerFactoryParams(idequipo, infoList, new Callback<InformacionFabricante>() {
             @Override
             public void success(InformacionFabricante o, Response response) {
                 pg.dismiss();
                 Toast.makeText(RegisterActivity.this, "registrado exitosamente: ", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(RegisterActivity.this, Main.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             }
 
             @Override

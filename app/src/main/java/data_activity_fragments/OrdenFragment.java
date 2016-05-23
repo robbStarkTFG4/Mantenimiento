@@ -81,26 +81,30 @@ public class OrdenFragment extends Fragment {
         final EditText numeroOrden = (EditText) view.findViewById(R.id.numero_orden);
         final EditText descripcion = (EditText) view.findViewById(R.id.descripcion_orden);
         final EditText encargado = (EditText) view.findViewById(R.id.encargado_orden);
+        final EditText actividad = (EditText) view.findViewById(R.id.actividad_orden);
+        final EditText prioridad = (EditText) view.findViewById(R.id.prioridad_orden);
 
         Button btn = (Button) view.findViewById(R.id.siguiente_orden);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (numeroOrden.getText().length() > 0 && encargado.getText().length() > 0 && descripcion.getText().length() > 0) {
-                    createOrden(numeroOrden.getText().toString(), descripcion.getText().toString(), encargado.getText().toString());
+                    createOrden(numeroOrden.getText().toString(), descripcion.getText().toString(), encargado.getText().toString(), actividad.getText().toString(), prioridad.getText().toString());
                     mListener.navigate("servicio");
-                }else{
-                    Toast.makeText(getContext(),"llena todos los datos",Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getContext(), "llena todos los datos", Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    private void createOrden(String numeroOrden, String encargado, String descripcion) {
+    private void createOrden(String numeroOrden, String descripcion, String encargado, String actividad, String prioridad) {
         Orden orden = new Orden();
         orden.setDescripcion(descripcion);
         orden.setEncargado(encargado);
         orden.setNumeroOrden(numeroOrden);
+        orden.setActividad(actividad);
+        orden.setPrioridad(prioridad);
         orderConsumer.consumeOrden(orden);
     }
 
@@ -131,7 +135,7 @@ public class OrdenFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
