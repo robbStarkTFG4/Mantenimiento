@@ -217,7 +217,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
             } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
                 // User cancelled the image capture
                 if (ruta != null) {
-                    Toast.makeText(getContext(), "borra archivo", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getContext(), "borra archivo", Toast.LENGTH_LONG).show();
                 }
             } else {
                 // Image capture failed, advise user

@@ -19,16 +19,24 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Main">
+        <activity
+            android:name=".Main"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DataActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LocalDBActivity"></activity>
+        <activity
+            android:name=".DataActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LocalDBActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

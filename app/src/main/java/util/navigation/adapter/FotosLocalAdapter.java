@@ -112,7 +112,7 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
 
         File fil = new File(foto.getArchivo());//
         if (fil.exists()) {
-            Toast.makeText(context, "si existe el archivo", Toast.LENGTH_LONG).show();
+            //Toast.makeText(context, "si existe el archivo", Toast.LENGTH_LONG).show();
             Picasso.with(context).load(fil).
                     resize((int) (metrics.widthPixels)// fil as parameter
                             , (int) (150)) // instead of Uri was file path in ExpandableCustomAdp
