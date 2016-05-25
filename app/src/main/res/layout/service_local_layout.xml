@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="7dp"
     android:layout_marginTop="7dp"
-    android:orientation="vertical"
-    android:padding="7dp">
+    android:layout_marginLeft="7dp"
+    android:padding="7dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/service_title"
+        android:id="@+id/service_title_local"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20dp" />
 
     <TextView
-        android:id="@+id/service_value"
+        android:id="@+id/service_value_local"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="25dp" />

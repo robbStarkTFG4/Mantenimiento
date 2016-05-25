@@ -1,15 +1,22 @@
 package menu_inicio;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import mantenimiento.mim.com.mantenimiento.LocalDBActivity;
 import mantenimiento.mim.com.mantenimiento.Main;
 import mantenimiento.mim.com.mantenimiento.R;
+import util.navigation.Modifier;
 import util.navigation.Navigator;
 
 /**
@@ -24,6 +31,7 @@ public class MainMenuFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -32,6 +40,24 @@ public class MainMenuFragment extends Fragment {
         View view = inflater.inflate(R.layout.main_menu_fragment, container, false);
         setUpControls(view);
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main, menu);
+        Modifier.changeMenuItemColor(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.archive:
+                Intent intent = new Intent(getContext(), LocalDBActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setUpControls(View view) {
@@ -52,7 +78,17 @@ public class MainMenuFragment extends Fragment {
         });
     }
 
-    public void setNavigator(Main navigator) {
-        this.navigator = navigator;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Navigator) {
+            navigator = (Navigator) context;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        navigator = null;
     }
 }

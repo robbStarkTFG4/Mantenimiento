@@ -1,10 +1,8 @@
-package register_activity_fragments;
+package local_db_activity_fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +11,10 @@ import android.widget.EditText;
 
 import mantenimiento.mim.com.mantenimiento.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ValueDialogConsumer} interface
- * to handle interaction events.
- * Use the {@link ValueDialogFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ValueDialogFragment extends DialogFragment {
+
+public class ValueDialogPortableFragment extends DialogFragment {
     // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -31,9 +23,9 @@ public class ValueDialogFragment extends DialogFragment {
     private String mParam1;
     private String mParam2;
 
-    private ValueDialogConsumer mListener;
+    private PortableDialogConsumer mListener;
 
-    public ValueDialogFragment() {
+    public ValueDialogPortableFragment() {
         // Required empty public constructor
     }
 
@@ -46,8 +38,8 @@ public class ValueDialogFragment extends DialogFragment {
      * @return A new instance of fragment ValueDialogFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ValueDialogFragment newInstance(String param1, String param2) {
-        ValueDialogFragment fragment = new ValueDialogFragment();
+    public static ValueDialogPortableFragment newInstance(String param1, String param2) {
+        ValueDialogPortableFragment fragment = new ValueDialogPortableFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -68,14 +60,14 @@ public class ValueDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_value, container, false);
-        final EditText edit = (EditText) view.findViewById(R.id.registro_parametro);
-        Button btn = (Button) view.findViewById(R.id.aceptar_registro);
+        View view = inflater.inflate(R.layout.fragment_value_dialog_portable, container, false);
+        final EditText edit = (EditText) view.findViewById(R.id.portable_parametro);
+        Button btn = (Button) view.findViewById(R.id.portable_aceptar);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onFragmentInteraction(edit.getText().toString());
-                ValueDialogFragment.this.dismiss();
+                mListener.consumeValue(edit.getText().toString());
+                ValueDialogPortableFragment.this.dismiss();
             }
         });
 
@@ -87,8 +79,8 @@ public class ValueDialogFragment extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof ValueDialogConsumer) {
-            mListener = (ValueDialogConsumer) context;
+        if (context instanceof PortableDialogConsumer) {
+            mListener = (PortableDialogConsumer) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement PortableDialogConsumer");
@@ -111,8 +103,8 @@ public class ValueDialogFragment extends DialogFragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface ValueDialogConsumer {
+    public interface PortableDialogConsumer {
         // TODO: Update argument type and name
-        void onFragmentInteraction(String valor);
+        void consumeValue(String valor);
     }
 }

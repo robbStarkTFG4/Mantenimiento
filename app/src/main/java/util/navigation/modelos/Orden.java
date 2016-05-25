@@ -1,7 +1,13 @@
 package util.navigation.modelos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import local_Db.EquipoDB;
+import local_Db.HistorialDetallesDB;
+import local_Db.LugarDB;
+import local_Db.OrdenDB;
 
 /**
  * Created by marcoisaac on 5/18/2016.
@@ -16,6 +22,32 @@ public class Orden implements Serializable {
     private String prioridad;
     private String actividad;
     private List<HistorialDetalles> historialDetallesList;
+
+    public Orden(OrdenDB current) {
+
+        this.setDescripcion(current.getDescripcion());
+        this.setEstatus(current.getStatus());
+        this.setNumeroOrden(current.getNumeroOrden());
+        this.setEncargado(current.getEncargado());
+        this.setPrioridad(current.getPrioridad());
+        this.setActividad(current.getActividad());
+
+        EquipoDB equipoDB = current.getEquipoDB();
+
+        Equipo equipo = new Equipo();
+        equipo.setNumeroEquipo(equipoDB.getNumeroEquipo());
+        equipo.setCodigoBarras(equipoDB.getCodigoBarras());
+        equipo.setIdequipo(equipoDB.getIdEquipo());
+        equipo.setListaNombreEquiposIdlistaNombre(equipoDB.getListaNombreEquipoIdListaNombre());
+
+
+        LugarDB lugarDB = equipoDB.getLugarDB();
+
+        Lugar lugar = new Lugar(lugarDB.getNombre());
+        equipo.setLugarIdlugar(lugar);
+
+        this.setEquipoIdequipo(equipo);
+    }
 
     public String getPrioridad() {
         return prioridad;
@@ -94,5 +126,16 @@ public class Orden implements Serializable {
 
     public void setEstatus(Integer estatus) {
         this.estatus = estatus;
+    }
+
+    public OrdenDB transform() {
+        OrdenDB orden = new OrdenDB();
+        orden.setEncargado(this.getEncargado());
+        orden.setPrioridad(this.getPrioridad());
+        orden.setActividad(this.getActividad());
+        orden.setDescripcion(this.getDescripcion());
+        orden.setStatus(this.getEstatus());
+        orden.setNumeroOrden(this.getNumeroOrden());
+        return orden;
     }
 }

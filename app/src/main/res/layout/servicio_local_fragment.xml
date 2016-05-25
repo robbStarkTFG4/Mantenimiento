@@ -1,0 +1,32 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="local_db_activity_fragments.ServicioLocalFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:id="@+id/label_local"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
+            android:text="llena los datos correspondientes" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/parametros_servicio_local"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/label"
+            android:layout_gravity="right"
+            android:layout_marginTop="20dp"
+            android:scrollbars="vertical" />
+
+    </RelativeLayout>
+
+
+</FrameLayout>

@@ -25,7 +25,6 @@ public class Main extends AppCompatActivity implements Navigator {
     private void launchMainMenu() {
         FragmentManager manager = getSupportFragmentManager();
         MainMenuFragment menu = new MainMenuFragment();
-        menu.setNavigator(this);
         manager.beginTransaction().replace(R.id.main_content, menu, "menu").commit();
     }
 

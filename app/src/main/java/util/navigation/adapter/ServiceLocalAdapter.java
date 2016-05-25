@@ -11,14 +11,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
-import data_activity_fragments.ServicioFragment;
+import local_Db.HistorialDetallesDB;
 import local_db_activity_fragments.ValueDialogPortableFragment;
 import mantenimiento.mim.com.mantenimiento.R;
-import register_activity_fragments.ValueDialogFragment;
 import util.navigation.PortableDialogItem;
 import util.navigation.UpdateList;
 import util.navigation.modelos.HistorialDetalles;
@@ -26,16 +24,11 @@ import util.navigation.modelos.HistorialDetalles;
 /**
  * Created by marcoisaac on 5/11/2016.
  */
-public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ViewHolder> implements UpdateList {
-    private FragmentManager manager;
-    private PortableDialogItem port;
-    private List<HistorialDetalles> mDataset;
+public class ServiceLocalAdapter extends RecyclerView.Adapter<ServiceLocalAdapter.ViewHolder> {
+    private final FragmentManager manager;
+    private PortableDialogItem portable;
+    private List<HistorialDetallesDB> mDataset;
 
-    @Override
-    public void updateModel(String val, int position) {
-        Log.d("NUEVO_VALOR", val);
-        mDataset.get(position).setValor(val);
-    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -48,43 +41,45 @@ public class ServiceAdapter extends RecyclerView.Adapter<ServiceAdapter.ViewHold
         public TextView label;
         public TextView value;
         private int pos;
+        private UpdateList update;
 
         public ViewHolder(LinearLayout v, PortableDialogItem port, FragmentManager manager) {
             super(v);
             this.port = port;
             this.manager = manager;
+            this.update = update;
             parent = v;
+            label = (TextView) v.findViewById(R.id.service_title_local);
+            value = (TextView) v.findViewById(R.id.service_value_local);
             parent.setOnClickListener(this);
-            label = (TextView) v.findViewById(R.id.service_title);
-            value = (TextView) v.findViewById(R.id.service_value);
         }
 
         @Override
         public void onClick(View v) {
             pos = getLayoutPosition();
-            port.itemPosition(pos);
             Log.d("ADAPTER", String.valueOf(pos));
+            port.itemPosition(getLayoutPosition());
             ValueDialogPortableFragment dialog = ValueDialogPortableFragment.newInstance(null, null);
-            dialog.show(manager, "digi");
+            dialog.show(manager, "portableDialog");
         }
     }
 
-    public ServiceAdapter(List<HistorialDetalles> myDataset, PortableDialogItem port, FragmentManager manager) {
+    public ServiceLocalAdapter(List<HistorialDetallesDB> myDataset, PortableDialogItem portable, FragmentManager manager) {
         mDataset = myDataset;
-        this.port = port;
+        this.portable = portable;
         this.manager = manager;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public ServiceAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                        int viewType) {
+    public ServiceLocalAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                             int viewType) {
         // create a new view
         LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.service_layout, parent, false);
+                .inflate(R.layout.service_local_layout, parent, false);
         // set the view's size, margins, paddings and layout parameters
 
-        ViewHolder vh = new ViewHolder(v, port, manager);
+        ViewHolder vh = new ViewHolder(v, portable, manager);
         return vh;
     }
 

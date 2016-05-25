@@ -1,0 +1,26 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="local_db_activity_fragments.LocalOrdesFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/empty_view_local"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No hay ordenes archivadas"
+            android:textSize="20dp" />
+
+        <util.navigation.custom.recycler.RecyclerViewEmpty
+            android:id="@+id/recycler_local"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+</FrameLayout>

@@ -2,13 +2,16 @@ package mantenimiento.mim.com.mantenimiento;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import data_activity_fragments.BarcodeReaderFragment;
@@ -18,11 +21,25 @@ import data_activity_fragments.FotoDialogFragment;
 import data_activity_fragments.ImageViewFragment;
 import data_activity_fragments.OrdenFragment;
 import data_activity_fragments.ServicioFragment;
+import local_Db.DaoMaster;
+import local_Db.DaoSession;
+import local_Db.EquipoDB;
+import local_Db.EquipoDBDao;
+import local_Db.FotoDB;
+import local_Db.FotoDBDao;
+import local_Db.HistorialDetallesDB;
+import local_Db.HistorialDetallesDBDao;
+import local_Db.LugarDB;
+import local_Db.LugarDBDao;
+import local_Db.OrdenDB;
+import local_Db.OrdenDBDao;
+import local_db_activity_fragments.ValueDialogPortableFragment;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import server.OrdenAPI;
 import util.navigation.Navigator;
+import util.navigation.PortableDialogItem;
 import util.navigation.SerialListHolder;
 import util.navigation.async_tasks.CompresImages;
 import util.navigation.modelos.Equipo;
@@ -33,8 +50,9 @@ import util.navigation.modelos.ListaNombreEquipos;
 import util.navigation.modelos.Orden;
 
 public class DataActivity extends AppCompatActivity implements Navigator, FotoDialogFragment.DialogConsumer
-        , CameraFragment.PhotosConsumer, ImageViewFragment.OnFragmentInteractionListener, BarcodeReaderFragment.EquipmentConsumer
-        , OrdenFragment.OrdenConsumer, ServicioFragment.HistoryConsumer, CompresImages.CompresConsumer {
+        , CameraFragment.PhotosConsumer, BarcodeReaderFragment.EquipmentConsumer
+        , OrdenFragment.OrdenConsumer, ServicioFragment.HistoryConsumer, CompresImages.CompresConsumer
+        , PortableDialogItem , ValueDialogPortableFragment.PortableDialogConsumer{
 
     private FragmentManager manager;
     private List<Foto> list;
@@ -46,11 +64,31 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     private Orden orden;
     private ProgressDialog pg;
 
+    // database objects
+    private SQLiteDatabase db;
+    private DaoMaster master;
+    public DaoSession session;
+    private int currentPortablePos;
+    //End database objects
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
+        setUpDB();
         launchReader();
+    }
+
+    private void setUpDB() {
+        try {
+            DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this, "mimDb13", null);
+            db = openHelper.getWritableDatabase();
+            master = new DaoMaster(db);
+            session = master.newSession();
+
+        } catch (Exception e) {
+            Log.d("d", e.getMessage());
+        }
     }
 
     private void launchReader() {
@@ -78,7 +116,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 break;
             case "servicio":
                 holder.setHistoryList(historyList);
-                manager.beginTransaction().replace(R.id.content, ServicioFragment.newInstance(holder, "dad")).addToBackStack(null).commit();
+                manager.beginTransaction().replace(R.id.content, ServicioFragment.newInstance(holder, "dad"),"servNet").addToBackStack(null).commit();
                 break;
             case "fotos":
                 manager.beginTransaction().replace(R.id.content, CameraFragment.newInstance("dadas", "dasda", this), "fot").addToBackStack(null).commit();
@@ -106,10 +144,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         return list;
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
 
-    }
 
     @Override
     public void consumeEquipment(Equipo equipo) {
@@ -164,6 +199,95 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public void archiveReport() {
+        //orden.setEquipoIdequipo(current);
+        //orden.setHistorialDetallesList(historyList);
+        // 1-lugar  2 - equipo 3 - orden  4 - historyList 5-fotos
+        final LugarDB lu = new LugarDB();
+        lu.setNombre(current.getLugarIdlugar().getNombre());
+
+        final EquipoDB equi = new EquipoDB();
+        equi.setNumeroEquipo(current.getNumeroEquipo());
+        equi.setCodigoBarras(current.getCodigoBarras());
+        equi.setListaNombreEquipoIdListaNombre(current.getListaNombreEquiposIdlistaNombre());
+        equi.setIdEquipo(current.getIdequipo());
+
+        final List<HistorialDetallesDB> listHis = new ArrayList<>();
+
+        for (int i = 0; i < historyList.size(); i++) {
+            HistorialDetalles his = historyList.get(i);
+
+            HistorialDetallesDB temp = new HistorialDetallesDB();
+            temp.setValor(his.getValor());
+            temp.setParametro(his.getParametro());
+            listHis.add(temp);
+        }
+
+        final List<FotoDB> fotoList = new ArrayList<>();
+
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                Foto foto = list.get(i);
+
+                FotoDB fotoDB = new FotoDB();
+                fotoDB.setArchivo(foto.getArchivo());
+                fotoDB.setDescripcion(foto.getDescripcion());
+                fotoDB.setTitulo(foto.getTitulo());
+                fotoList.add(fotoDB);
+            }
+        }
+
+        //List<FotoDB> listDB;
+        final OrdenDB ordenDB = orden.transform();
+
+        new AsyncTask<Void, Void, Boolean>() {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                LugarDBDao lugarDao = session.getLugarDBDao();
+                lugarDao.insert(lu);
+                Log.d("LUGAR ID: ", String.valueOf(lu.getId()));
+
+                EquipoDBDao equiDao = session.getEquipoDBDao();
+                equi.setLugarDB(lu);
+                equiDao.insert(equi);
+                Log.d("EQUIPO ID: ", String.valueOf(equi.getId()));
+
+                OrdenDBDao orDao = session.getOrdenDBDao();
+                ordenDB.setEquipoDB(equi);
+                orDao.insert(ordenDB);
+                Log.d("ORDEN ID: ", String.valueOf(ordenDB.getId()));
+
+
+                HistorialDetallesDBDao hisDao = session.getHistorialDetallesDBDao();
+                for (int i = 0; i < listHis.size(); i++) {
+                    HistorialDetallesDB his = listHis.get(i);
+                    his.setOrdenDB(ordenDB);
+                    hisDao.insert(his);
+                    Log.d("HISTORIAL ID: ", String.valueOf(his.getId()) + " PARAMETRO: " + his.getParametro());
+                }
+
+                if (fotoList.size() > 0) {
+                    FotoDBDao photoDao = session.getFotoDBDao();
+                    for (int i = 0; i < fotoList.size(); i++) {
+                        FotoDB fo = fotoList.get(i);
+                        fo.setOrdenDB(ordenDB);
+                        photoDao.insert(fo);
+                    }
+
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+                closeService();
+            }
+        }.execute();
     }
 
     private void upLoadHistoryDetails(final int idorden, final ProgressDialog pg) {
@@ -238,5 +362,17 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void itemPosition(int pos) {
+        this.currentPortablePos = pos;
+    }
+
+    @Override
+    public void consumeValue(String valor) {
+        FragmentManager manager=getSupportFragmentManager();
+        ServicioFragment serv= (ServicioFragment) manager.findFragmentByTag("servNet");
+        serv.setValue(valor,currentPortablePos);
     }
 }

@@ -13,9 +13,13 @@ public class Modifier {
     public static void changeMenuItemColor(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
-            Drawable draw = item.getIcon();
-            Drawable dr = DrawableCompat.wrap(draw);
-            DrawableCompat.setTint(dr, Color.WHITE);
+            if (item.getIcon() != null) {
+                Drawable draw = item.getIcon();
+                Drawable dr = DrawableCompat.wrap(draw);
+                if (dr != null) {
+                    DrawableCompat.setTint(dr, Color.WHITE);
+                }
+            }
         }
     }
 }

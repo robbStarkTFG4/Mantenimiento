@@ -3,6 +3,8 @@ package util.navigation.modelos;
 import java.io.Serializable;
 import java.util.List;
 
+import local_Db.EquipoDB;
+
 /**
  * Created by marcoisaac on 5/11/2016.
  */
@@ -83,5 +85,9 @@ public class Equipo implements Serializable {
 
     public void setInformacionFabricanteList(List<InformacionFabricante> informacionFabricanteList) {
         this.informacionFabricanteList = informacionFabricanteList;
+    }
+
+    public EquipoDB transform() {
+        return null;
     }
 }

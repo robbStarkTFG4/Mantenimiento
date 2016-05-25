@@ -1,13 +1,10 @@
-package data_activity_fragments;
+package local_db_activity_fragments;
 
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,33 +14,31 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import local_Db.HistorialDetallesDB;
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.PortableDialogItem;
 import util.navigation.SerialListHolder;
 import util.navigation.adapter.ServiceAdapter;
+import util.navigation.adapter.ServiceLocalAdapter;
 import util.navigation.modelos.HistorialDetalles;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ServicioFragment#newInstance} factory method to
+ * Use the {@link ServicioLocalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ServicioFragment extends Fragment {
+public class ServicioLocalFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
     private String mParam2;
     private Navigator navigator;
 
@@ -51,10 +46,10 @@ public class ServicioFragment extends Fragment {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private List<HistorialDetalles> dataList;
-    private HistoryConsumer consumer;
+    private List<HistorialDetallesDB> dataList;
+    private HistoryConsumerLocal consumer;
 
-    public ServicioFragment() {
+    public ServicioLocalFragment() {
         // Required empty public constructor
     }
 
@@ -67,8 +62,8 @@ public class ServicioFragment extends Fragment {
      * @return A new instance of fragment ServicioFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ServicioFragment newInstance(SerialListHolder param1, String param2) {
-        ServicioFragment fragment = new ServicioFragment();
+    public static ServicioLocalFragment newInstance(SerialListHolder param1, String param2) {
+        ServicioLocalFragment fragment = new ServicioLocalFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -80,7 +75,7 @@ public class ServicioFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            dataList = ((SerialListHolder) getArguments().getSerializable(ARG_PARAM1)).getHistoryList();
+            dataList = ((SerialListHolder) getArguments().getSerializable(ARG_PARAM1)).getHistoryListDB();
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
@@ -91,14 +86,14 @@ public class ServicioFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_servicio, container, false);
+        View view = inflater.inflate(R.layout.servicio_local_fragment, container, false);
         recyclerSetUp(view);
         return view;
     }
 
 
     private void recyclerSetUp(View view) {
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.parametros_servicio);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.parametros_servicio_local);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -109,13 +104,13 @@ public class ServicioFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mAdapter = new ServiceAdapter(dataList, (PortableDialogItem) getContext(), getFragmentManager());
+        mAdapter = new ServiceLocalAdapter(dataList, (PortableDialogItem) getContext(), getFragmentManager());
         mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.servicio_menu, menu);
+        inflater.inflate(R.menu.servicio_local_menu, menu);
         Modifier.changeMenuItemColor(menu);
     }
 
@@ -129,10 +124,10 @@ public class ServicioFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         switch (id) {
-            case R.id.fotos:
+            case R.id.fotos_local:
                 navigator.navigate("fotos");
                 break;
-            case R.id.enviar:
+            case R.id.enviar_local:
                 AlertDialog alert = new AlertDialog.Builder(getContext())
                         .setMessage("estas seguro?").setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
                             @Override
@@ -148,8 +143,8 @@ public class ServicioFragment extends Fragment {
                         }).create();
                 alert.show();
                 break;
-            case R.id.archiva_service:
-                AlertDialog alertArchivar = new AlertDialog.Builder(getContext())
+            case R.id.archiva_service_local:
+                AlertDialog alert2 = new AlertDialog.Builder(getContext())
                         .setMessage("estas seguro?").setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -159,10 +154,10 @@ public class ServicioFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 consumer.consume(dataList);
-                                consumer.archiveReport();
+                                consumer.update();
                             }
                         }).create();
-                alertArchivar.show();
+                alert2.show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -173,20 +168,20 @@ public class ServicioFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof Navigator) {
             navigator = (Navigator) context;
-            consumer = (HistoryConsumer) context;
+            consumer = (HistoryConsumerLocal) context;
         }
     }
 
-    public void setValue(String valor, int currentPortablePos) {
-        dataList.get(currentPortablePos).setValor(valor);
+    public void setValue(String valor, int currentItem) {
+        dataList.get(currentItem).setValor(valor);
         mAdapter.notifyDataSetChanged();
     }
 
-    public interface HistoryConsumer {
-        public void consume(List<HistorialDetalles> list);
+    public interface HistoryConsumerLocal {
+        public void consume(List<HistorialDetallesDB> list);
 
         public void upload();
 
-        public void archiveReport();
+        public void update();
     }
 }

@@ -174,7 +174,7 @@ public class TypeFragment extends Fragment implements OnclickLink {
             navigator = (Navigator) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement ValueDialogConsumer");
+                    + " must implement PortableDialogConsumer");
         }
     }
 
