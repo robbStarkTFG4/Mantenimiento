@@ -147,7 +147,4 @@ public class FotoDB implements Serializable {
         myDao.refresh(this);
     }
 
-    public OrdenDB getOrdenDB2() {
-        return ordenDB;
-    }
 }

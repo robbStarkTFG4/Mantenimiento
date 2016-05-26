@@ -9,7 +9,7 @@ import de.greenrobot.dao.DaoException;
 /**
  * Entity mapped to table HISTORIAL_DETALLES_DB.
  */
-public class HistorialDetallesDB implements Serializable {
+public class HistorialDetallesDB implements Serializable{
 
     private Long id;
     private Integer idhistorial;

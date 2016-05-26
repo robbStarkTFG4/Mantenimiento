@@ -12,7 +12,8 @@ import util.navigation.modelos.Equipo;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.ListaNombreEquipos;
 
-/** Service used to register an equipment into the DB
+/**
+ * Service used to register an equipment into the DB
  * Created by marcoisaac on 5/19/2016.
  */
 public interface RegisterAPI {
@@ -39,6 +40,9 @@ public interface RegisterAPI {
 
     @GET("/generic")
     public void getBarCode(Callback<String> cb);
+
+    @GET("/generic/valide/{codigo}")
+    public void validateCode(@Path("codigo") String codigo, Callback<String> cb);
 
     @GET("/com.mim.entities.listanombreequipos")
     public void getListNombreEquipos(Callback<List<ListaNombreEquipos>> cb);

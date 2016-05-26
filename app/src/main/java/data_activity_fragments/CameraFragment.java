@@ -12,6 +12,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -110,6 +113,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -139,6 +143,22 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         if (consumer != null) {
             consumer.setPhotosList(dataList);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_camera, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.camera_foto:
+                cameraIntent();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void dataSetUp() {

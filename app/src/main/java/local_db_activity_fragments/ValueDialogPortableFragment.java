@@ -71,7 +71,13 @@ public class ValueDialogPortableFragment extends DialogFragment {
             }
         });
 
-
+        Button cancelBtn = (Button) view.findViewById(R.id.cancel_portable);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueDialogPortableFragment.this.dismiss();
+            }
+        });
         return view;
     }
 

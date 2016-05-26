@@ -135,6 +135,7 @@ public class Orden implements Serializable {
         orden.setActividad(this.getActividad());
         orden.setDescripcion(this.getDescripcion());
         orden.setStatus(this.getEstatus());
+        orden.setMostrar(false);
         orden.setNumeroOrden(this.getNumeroOrden());
         return orden;
     }

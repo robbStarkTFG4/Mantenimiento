@@ -36,7 +36,8 @@
                 android:id="@+id/numero_orden"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp" />
+                android:layout_marginTop="7dp"
+                android:inputType="text" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -49,7 +50,8 @@
                 android:id="@+id/descripcion_orden"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp" />
+                android:layout_marginTop="7dp"
+                android:inputType="text" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,7 +64,8 @@
                 android:id="@+id/encargado_orden"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp" />
+                android:layout_marginTop="7dp"
+                android:inputType="text" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -75,7 +78,8 @@
                 android:id="@+id/actividad_orden"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp" />
+                android:layout_marginTop="7dp"
+                android:inputType="text" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -88,7 +92,8 @@
                 android:id="@+id/prioridad_orden"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp" />
+                android:layout_marginTop="7dp"
+                android:inputType="text" />
 
             <Button
                 android:id="@+id/siguiente_orden"

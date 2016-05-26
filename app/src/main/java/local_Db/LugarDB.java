@@ -9,7 +9,7 @@ import de.greenrobot.dao.DaoException;
 /**
  * Entity mapped to table LUGAR_DB.
  */
-public class LugarDB implements Serializable {
+public class LugarDB implements Serializable{
 
     private Long id;
     private String nombre;

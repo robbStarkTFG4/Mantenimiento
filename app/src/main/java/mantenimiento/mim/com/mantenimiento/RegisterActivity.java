@@ -76,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
     private void loadFactoryParams() {
         final ProgressDialog prog = new ProgressDialog(this);
         prog.setMessage("cargando...");
+        prog.show();
         RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.registerFactoryParams(this.nombreEquipo.getIdlistaNombre(), new Callback<List<InformacionFabricante>>() {
             @Override
@@ -156,6 +157,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
 
         final ProgressDialog pg = new ProgressDialog(this);
         pg.setMessage("registrando espere....");
+        pg.show();
 
         RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.registerEquipment(lineName, equipo, new Callback<Equipo>() {

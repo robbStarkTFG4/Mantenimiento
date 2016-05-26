@@ -81,7 +81,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
 
     private void setUpDB() {
         try {
-            DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this, "mimDb13", null);
+            DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this, "mimDb14", null);
             db = openHelper.getWritableDatabase();
             master = new DaoMaster(db);
             session = master.newSession();

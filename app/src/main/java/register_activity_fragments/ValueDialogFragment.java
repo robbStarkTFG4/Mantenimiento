@@ -79,7 +79,13 @@ public class ValueDialogFragment extends DialogFragment {
             }
         });
 
-
+        Button cancelBtn = (Button) view.findViewById(R.id.cancelar_registro);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ValueDialogFragment.this.dismiss();
+            }
+        });
         return view;
     }
 

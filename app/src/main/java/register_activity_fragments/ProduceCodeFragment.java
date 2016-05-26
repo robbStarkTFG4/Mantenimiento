@@ -1,7 +1,9 @@
 package register_activity_fragments;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import mantenimiento.mim.com.mantenimiento.R;
 import retrofit.Callback;
@@ -42,7 +49,7 @@ public class ProduceCodeFragment extends Fragment {
         }
     });
     private ProgressDialog dialog;
-    private TextView caja;
+    private EditText caja;
     private BarcodeConsumer consumer;
 
     public ProduceCodeFragment() {
@@ -77,17 +84,26 @@ public class ProduceCodeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_produce_code, container, false);
 
-        caja = (TextView) view.findViewById(R.id.show_code);
+        caja = (EditText) view.findViewById(R.id.show_code);
         Button btn = (Button) view.findViewById(R.id.proceed);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProduceCodeFragment.this.navigator.navigate("lugar");
+                validateCode(caja.getText().toString());
+            }
+        });
+
+        Button btnScan = (Button) view.findViewById(R.id.scan_code);
+        btnScan.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                readCode();
             }
         });
 
@@ -113,6 +129,61 @@ public class ProduceCodeFragment extends Fragment {
 
         final RegisterAPI service =
                 restAdapter.create(RegisterAPI.class);*/
+        generateCodeFromDB();
+        return view;
+    }
+
+    private void readCode() {
+        //launch camera
+        IntentIntegrator integrator = new IntentIntegrator((Activity) getContext());
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.ONE_D_CODE_TYPES);
+        integrator.setPrompt("Scan a barcode");
+        integrator.setCameraId(0);  // Use a specific camera of the device
+        integrator.setBeepEnabled(false);
+        integrator.setBarcodeImageEnabled(true);
+        integrator.forSupportFragment(this).initiateScan();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        String toast;
+        if (result != null) {
+            if (result.getContents() == null) {
+                toast = "Cancelado";
+            } else {
+                String res = result.getContents();
+                caja.setText(res);
+            }
+        }
+    }
+
+    private void validateCode(String code) {
+        final ProgressDialog dialog2 = new ProgressDialog(this.getContext());
+        dialog2.setMessage("validando codigo....");
+        dialog2.show();
+        RegisterAPI service = RegisterAPI.Factory.getInstance();
+        service.validateCode(code, new Callback<String>() {
+            @Override
+            public void success(String s, Response response) {
+                dialog2.dismiss();
+                if (s.equals("valido")) {
+                    consumer.barCodeResult(caja.getText().toString());
+                    ProduceCodeFragment.this.navigator.navigate("lugar");
+                } else {
+                    Toast.makeText(ProduceCodeFragment.this.getContext(), "codigo invalido", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                dialog2.dismiss();
+                Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void generateCodeFromDB() {
         RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.getBarCode(new Callback<String>() {
             @Override
@@ -128,7 +199,6 @@ public class ProduceCodeFragment extends Fragment {
                 caja.setTextColor(Color.RED);
             }
         });
-        return view;
     }
 
     public void showCode() {

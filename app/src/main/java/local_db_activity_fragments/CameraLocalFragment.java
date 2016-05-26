@@ -12,6 +12,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -113,6 +116,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -142,6 +146,22 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         if (consumer != null) {
             consumer.setPhotosList(dataList);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.camera_local_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.camera_foto_local:
+                cameraIntent();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void dataSetUp() {
@@ -212,7 +232,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == ((Activity) getContext()).RESULT_OK) {
                 FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
-                foto.show(getFragmentManager(), "dialog");
+                foto.show(getFragmentManager(), "dialog2");
 
             } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
                 // User cancelled the image capture

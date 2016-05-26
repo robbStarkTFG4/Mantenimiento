@@ -36,8 +36,9 @@ public class OrdenDBDao extends AbstractDao<OrdenDB, Long> {
         public final static Property Prioridad = new Property(5, String.class, "prioridad", false, "PRIORIDAD");
         public final static Property Actividad = new Property(6, String.class, "actividad", false, "ACTIVIDAD");
         public final static Property Encargado = new Property(7, String.class, "encargado", false, "ENCARGADO");
-        public final static Property EquipoId = new Property(8, Long.class, "equipoId", false, "EQUIPO_ID");
-        public final static Property OrdenId = new Property(9, Long.class, "ordenId", false, "ORDEN_ID");
+        public final static Property Mostrar = new Property(8, Boolean.class, "mostrar", false, "MOSTRAR");
+        public final static Property EquipoId = new Property(9, Long.class, "equipoId", false, "EQUIPO_ID");
+        public final static Property OrdenId = new Property(10, Long.class, "ordenId", false, "ORDEN_ID");
     };
 
     private DaoSession daoSession;
@@ -65,8 +66,9 @@ public class OrdenDBDao extends AbstractDao<OrdenDB, Long> {
                 "'PRIORIDAD' TEXT," + // 5: prioridad
                 "'ACTIVIDAD' TEXT," + // 6: actividad
                 "'ENCARGADO' TEXT," + // 7: encargado
-                "'EQUIPO_ID' INTEGER," + // 8: equipoId
-                "'ORDEN_ID' INTEGER);"); // 9: ordenId
+                "'MOSTRAR' INTEGER," + // 8: mostrar
+                "'EQUIPO_ID' INTEGER," + // 9: equipoId
+                "'ORDEN_ID' INTEGER);"); // 10: ordenId
     }
 
     /** Drops the underlying database table. */
@@ -120,14 +122,19 @@ public class OrdenDBDao extends AbstractDao<OrdenDB, Long> {
             stmt.bindString(8, encargado);
         }
  
+        Boolean mostrar = entity.getMostrar();
+        if (mostrar != null) {
+            stmt.bindLong(9, mostrar ? 1l: 0l);
+        }
+ 
         Long equipoId = entity.getEquipoId();
         if (equipoId != null) {
-            stmt.bindLong(9, equipoId);
+            stmt.bindLong(10, equipoId);
         }
  
         Long ordenId = entity.getOrdenId();
         if (ordenId != null) {
-            stmt.bindLong(10, ordenId);
+            stmt.bindLong(11, ordenId);
         }
     }
 
@@ -155,8 +162,9 @@ public class OrdenDBDao extends AbstractDao<OrdenDB, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // prioridad
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // actividad
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // encargado
-            cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // equipoId
-            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9) // ordenId
+            cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0, // mostrar
+            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // equipoId
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10) // ordenId
         );
         return entity;
     }
@@ -172,8 +180,9 @@ public class OrdenDBDao extends AbstractDao<OrdenDB, Long> {
         entity.setPrioridad(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setActividad(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setEncargado(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
-        entity.setEquipoId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
-        entity.setOrdenId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setMostrar(cursor.isNull(offset + 8) ? null : cursor.getShort(offset + 8) != 0);
+        entity.setEquipoId(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setOrdenId(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
      }
     
     /** @inheritdoc */

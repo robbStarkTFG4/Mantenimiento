@@ -95,7 +95,7 @@ public class FotoDialogFragment extends DialogFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        consumer=null;
+        consumer = null;
     }
 
     private void controlSetUp(View view) {
@@ -106,7 +106,9 @@ public class FotoDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (titleField.getText().toString().length() > 0 && descriptionField.getText().toString().length() > 0) {
-                    consumer.consumeDialog(titleField.getText().toString(), descriptionField.getText().toString());
+                    if (consumer != null) {
+                        consumer.consumeDialog(titleField.getText().toString(), descriptionField.getText().toString());
+                    }
                     FotoDialogFragment.this.dismiss();
                 }
             }

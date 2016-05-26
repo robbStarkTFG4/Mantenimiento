@@ -74,7 +74,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
 
     private void setUpDB() {
         try {
-            DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this, "mimDb13", null);
+            DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(this, "mimDb14", null);
             db = openHelper.getWritableDatabase();
             master = new DaoMaster(db);
             session = master.newSession();
@@ -113,7 +113,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
 
     private void loadDataFromDB() {
         OrdenDBDao dao = session.getOrdenDBDao();
-        dataList = dao.loadAll();
+        dataList = dao.queryBuilder().where(OrdenDBDao.Properties.Mostrar.eq(false)).list();
         if (dataList != null) {
             if (dataList.size() > 0) {
                 for (int i = 0; i < dataList.size(); i++) {
@@ -254,6 +254,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 }
             });
         } else {
+            //current.
+            current.setMostrar(true);
+            session.getOrdenDBDao().update(current);
             pg.dismiss();
             Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
             closeService();
@@ -277,6 +280,8 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     @Override
     public void compresResult(boolean res) {
         if (res) {
+            current.setMostrar(true);
+            session.getOrdenDBDao().update(current);
             pg.dismiss();
             Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
             Log.d("RESULTADO_COMPRESION: ", "funciono");

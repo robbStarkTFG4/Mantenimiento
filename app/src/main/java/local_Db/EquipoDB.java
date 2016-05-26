@@ -9,7 +9,7 @@ import de.greenrobot.dao.DaoException;
 /**
  * Entity mapped to table EQUIPO_DB.
  */
-public class EquipoDB implements Serializable {
+public class EquipoDB implements Serializable{
 
     private Long id;
     private Integer idEquipo;

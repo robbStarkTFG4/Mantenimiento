@@ -10,7 +10,7 @@ import util.navigation.modelos.Equipo;
 /**
  * Entity mapped to table ORDEN_DB.
  */
-public class OrdenDB implements Serializable {
+public class OrdenDB implements Serializable{
 
     private Long id;
     private Integer idOrden;
@@ -20,6 +20,7 @@ public class OrdenDB implements Serializable {
     private String prioridad;
     private String actividad;
     private String encargado;
+    private Boolean mostrar;
     private Long equipoId;
     private Long ordenId;
 
@@ -35,8 +36,6 @@ public class OrdenDB implements Serializable {
     private List<HistorialDetallesDB> historialDetallesDBList;
     private List<FotoDB> fotoDBList;
 
-
-
     public OrdenDB() {
     }
 
@@ -44,7 +43,7 @@ public class OrdenDB implements Serializable {
         this.id = id;
     }
 
-    public OrdenDB(Long id, Integer idOrden, String descripcion, Integer status, String numeroOrden, String prioridad, String actividad, String encargado, Long equipoId, Long ordenId) {
+    public OrdenDB(Long id, Integer idOrden, String descripcion, Integer status, String numeroOrden, String prioridad, String actividad, String encargado, Boolean mostrar, Long equipoId, Long ordenId) {
         this.id = id;
         this.idOrden = idOrden;
         this.descripcion = descripcion;
@@ -53,6 +52,7 @@ public class OrdenDB implements Serializable {
         this.prioridad = prioridad;
         this.actividad = actividad;
         this.encargado = encargado;
+        this.mostrar = mostrar;
         this.equipoId = equipoId;
         this.ordenId = ordenId;
     }
@@ -125,6 +125,14 @@ public class OrdenDB implements Serializable {
 
     public void setEncargado(String encargado) {
         this.encargado = encargado;
+    }
+
+    public Boolean getMostrar() {
+        return mostrar;
+    }
+
+    public void setMostrar(Boolean mostrar) {
+        this.mostrar = mostrar;
     }
 
     public Long getEquipoId() {
@@ -236,15 +244,11 @@ public class OrdenDB implements Serializable {
         myDao.refresh(this);
     }
 
-    public EquipoDB getEquipoDB2() {
-        return this.equipoDB;
-    }
-
-    public List<HistorialDetallesDB> getHistorialDetallesDBList2() {
-        return historialDetallesDBList;
-    }
-
     public void setHistoryDetallesDB(List<HistorialDetallesDB> historyDetallesDB) {
         this.historialDetallesDBList = historyDetallesDB;
+    }
+
+    public EquipoDB getEquipoDB2() {
+        return equipoDB;
     }
 }
