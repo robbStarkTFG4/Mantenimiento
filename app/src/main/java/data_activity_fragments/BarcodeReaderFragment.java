@@ -179,16 +179,20 @@ public class BarcodeReaderFragment extends Fragment {
 
             @Override
             public void success(Equipo equipo, Response response) {
-                consumer.consumeEquipment(equipo);
-                BarcodeReaderFragment.this.idTipo = equipo.getListaNombreEquiposIdlistaNombre();
-                //Toast.makeText(getContext(), "numero: " + BarcodeReaderFragment.this.idTipo, Toast.LENGTH_SHORT).show();
-                getFactoryList(dialog, equipo.getIdequipo());
+                if (consumer != null) {
+                    consumer.consumeEquipment(equipo);
+                    BarcodeReaderFragment.this.idTipo = equipo.getListaNombreEquiposIdlistaNombre();
+                    //Toast.makeText(getContext(), "numero: " + BarcodeReaderFragment.this.idTipo, Toast.LENGTH_SHORT).show();
+                    getFactoryList(dialog, equipo.getIdequipo());
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                dialog.dismiss();
-                Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                if (consumer != null) {
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -199,15 +203,19 @@ public class BarcodeReaderFragment extends Fragment {
             @Override
             public void success(List<InformacionFabricante> informacionFabricantes, Response response) {
                 //dialog.dismiss();
-                getHistorialDetalles(dialog, idequipo);
-                consumer.consumeFactoryList(informacionFabricantes);
+                if (consumer != null) {
+                    getHistorialDetalles(dialog, idequipo);
+                    consumer.consumeFactoryList(informacionFabricantes);
+                }
                 //Toast.makeText(getContext(), "exito " + informacionFabricantes.get(0).getParametro(), Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void failure(RetrofitError error) {
-                dialog.dismiss();
-                Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                if (consumer != null) {
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -217,14 +225,18 @@ public class BarcodeReaderFragment extends Fragment {
         service.getHistorialDetalles(idequipo, new Callback<List<HistorialDetalles>>() {
             @Override
             public void success(List<HistorialDetalles> historialDetalles, Response response) {
-                consumer.consumeHistoryList(historialDetalles);
-                retrieveNombre(dialog, idTipo);
+                if (consumer != null) {
+                    consumer.consumeHistoryList(historialDetalles);
+                    retrieveNombre(dialog, idTipo);
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                dialog.dismiss();
-                Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                if (consumer != null) {
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -234,15 +246,19 @@ public class BarcodeReaderFragment extends Fragment {
         service.getNombreEquipo(idTipo, new Callback<ListaNombreEquipos>() {
             @Override
             public void success(ListaNombreEquipos s, Response response) {
-                dialog.dismiss();
-                consumer.consumeNombreEquipo(s.getNombre());
-                navigator.navigate("equipo");
+                if (consumer != null) {
+                    dialog.dismiss();
+                    consumer.consumeNombreEquipo(s.getNombre());
+                    navigator.navigate("equipo");
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                dialog.dismiss();
-                Toast.makeText(getContext(), "hubo algun error nombre tipo ", Toast.LENGTH_LONG).show();
+                if (consumer != null) {
+                    dialog.dismiss();
+                    Toast.makeText(getContext(), "hubo algun error nombre tipo ", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -258,10 +274,6 @@ public class BarcodeReaderFragment extends Fragment {
             Toast.makeText(getContext(), "Error", Toast.LENGTH_LONG).show();
         }
 
-    }
-
-    private void displayToast(String toast) {
-        Toast.makeText(getContext(), toast, Toast.LENGTH_LONG).show();
     }
 
 

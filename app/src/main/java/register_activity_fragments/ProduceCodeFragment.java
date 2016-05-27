@@ -166,19 +166,23 @@ public class ProduceCodeFragment extends Fragment {
         service.validateCode(code, new Callback<String>() {
             @Override
             public void success(String s, Response response) {
-                dialog2.dismiss();
-                if (s.equals("valido")) {
-                    consumer.barCodeResult(caja.getText().toString());
-                    ProduceCodeFragment.this.navigator.navigate("lugar");
-                } else {
-                    Toast.makeText(ProduceCodeFragment.this.getContext(), "codigo invalido", Toast.LENGTH_SHORT).show();
+                if (consumer != null) {
+                    dialog2.dismiss();
+                    if (s.equals("valido")) {
+                        consumer.barCodeResult(caja.getText().toString());
+                        ProduceCodeFragment.this.navigator.navigate("lugar");
+                    } else {
+                        Toast.makeText(ProduceCodeFragment.this.getContext(), "codigo invalido", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                dialog2.dismiss();
-                Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
+                if (consumer != null) {
+                    dialog2.dismiss();
+                    Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -188,15 +192,19 @@ public class ProduceCodeFragment extends Fragment {
         service.getBarCode(new Callback<String>() {
             @Override
             public void success(String s, Response response) {
-                caja.setText(s);
-                consumer.barCodeResult(s);
-                dialog.dismiss();
+                if (consumer != null) {
+                    caja.setText(s);
+                    consumer.barCodeResult(s);
+                    dialog.dismiss();
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                caja.setText("hubo algun error");
-                caja.setTextColor(Color.RED);
+                if (consumer != null) {
+                    dialog.dismiss();
+                    Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

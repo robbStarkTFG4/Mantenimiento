@@ -52,7 +52,7 @@ import util.navigation.modelos.Orden;
 public class DataActivity extends AppCompatActivity implements Navigator, FotoDialogFragment.DialogConsumer
         , CameraFragment.PhotosConsumer, BarcodeReaderFragment.EquipmentConsumer
         , OrdenFragment.OrdenConsumer, ServicioFragment.HistoryConsumer, CompresImages.CompresConsumer
-        , PortableDialogItem , ValueDialogPortableFragment.PortableDialogConsumer{
+        , PortableDialogItem, ValueDialogPortableFragment.PortableDialogConsumer {
 
     private FragmentManager manager;
     private List<Foto> list;
@@ -116,7 +116,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 break;
             case "servicio":
                 holder.setHistoryList(historyList);
-                manager.beginTransaction().replace(R.id.content, ServicioFragment.newInstance(holder, "dad"),"servNet").addToBackStack(null).commit();
+                manager.beginTransaction().replace(R.id.content, ServicioFragment.newInstance(holder, "dad"), "servNet").addToBackStack(null).commit();
                 break;
             case "fotos":
                 manager.beginTransaction().replace(R.id.content, CameraFragment.newInstance("dadas", "dasda", this), "fot").addToBackStack(null).commit();
@@ -143,7 +143,6 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     public List<Foto> getPhotosList() {
         return list;
     }
-
 
 
     @Override
@@ -371,8 +370,8 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
 
     @Override
     public void consumeValue(String valor) {
-        FragmentManager manager=getSupportFragmentManager();
-        ServicioFragment serv= (ServicioFragment) manager.findFragmentByTag("servNet");
-        serv.setValue(valor,currentPortablePos);
+        FragmentManager manager = getSupportFragmentManager();
+        ServicioFragment serv = (ServicioFragment) manager.findFragmentByTag("servNet");
+        serv.setValue(valor, currentPortablePos);
     }
 }
