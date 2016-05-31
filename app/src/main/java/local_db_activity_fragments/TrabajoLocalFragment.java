@@ -1,4 +1,4 @@
-package fotographic_report_fragments;
+package local_db_activity_fragments;
 
 
 import android.content.Context;
@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -21,31 +20,30 @@ import local_Db.OrdenDB;
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Modifier;
 import util.navigation.Navigator;
-import util.navigation.modelos.Lugar;
 import util.navigation.modelos.Orden;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TrabajoFragment#newInstance} factory method to
+ * Use the {@link TrabajoLocalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TrabajoFragment extends Fragment {
+public class TrabajoLocalFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private Orden mParam1;
+    private OrdenDB mParam1;
     private Long mParam2;
     private Navigator navigator;
     private EditText actividad;
     private EditText descripcion;
-    private PhotographicConsumer consumer;
+    private PhotographicLocalConsumer consumer;
     private EditText encargado;
 
 
-    public TrabajoFragment() {
+    public TrabajoLocalFragment() {
         // Required empty public constructor
     }
 
@@ -58,11 +56,11 @@ public class TrabajoFragment extends Fragment {
      * @return A new instance of fragment TrabajoFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TrabajoFragment newInstance(Orden param1, Long param2) {
-        TrabajoFragment fragment = new TrabajoFragment();
+    public static TrabajoLocalFragment newInstance(OrdenDB param1, Long param2) {
+        TrabajoLocalFragment fragment = new TrabajoLocalFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, param1);
-        args.putLong(ARG_PARAM2, param2);
+        //args.putLong(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,7 +69,7 @@ public class TrabajoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = (Orden) getArguments().getSerializable(ARG_PARAM1);
+            mParam1 = (OrdenDB) getArguments().getSerializable(ARG_PARAM1);
             mParam2 = getArguments().getLong(ARG_PARAM2);
         }
         setHasOptionsMenu(true);
@@ -81,12 +79,12 @@ public class TrabajoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_trabajo, container, false);
+        View view = inflater.inflate(R.layout.fragment_trabajo_local, container, false);
 
 
-        actividad = (EditText) view.findViewById(R.id.actividad_photographic);
-        encargado = (EditText) view.findViewById(R.id.encargado_photographic);
-        descripcion = (EditText) view.findViewById(R.id.descripcion_photographic);
+        actividad = (EditText) view.findViewById(R.id.actividad_photographic_local);
+        encargado = (EditText) view.findViewById(R.id.encargado_photographic_local);
+        descripcion = (EditText) view.findViewById(R.id.descripcion_photographic_local);
 
         if (mParam1 != null) {
             actividad.setText(mParam1.getActividad());
@@ -103,7 +101,7 @@ public class TrabajoFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof Navigator) {
             navigator = (Navigator) context;
-            consumer = (PhotographicConsumer) context;
+            consumer = (PhotographicLocalConsumer) context;
         }
     }
 
@@ -125,7 +123,7 @@ public class TrabajoFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.fotos_photographic:
-                navigator.navigate("fotillos");
+                navigator.navigate("fotos");
                 break;
             case R.id.archivar_photographic:
                 AlertDialog alertArchivar = new AlertDialog.Builder(getContext())
@@ -180,25 +178,31 @@ public class TrabajoFragment extends Fragment {
 
 
     @NonNull
-    private Orden buildOrder() {
-        Orden orden = new Orden();
-        orden.setActividad(actividad.getText().toString());
-        orden.setDescripcion(descripcion.getText().toString());
-        orden.setEncargado(encargado.getText().toString());
-        return orden;
+    private OrdenDB buildOrder() {
+
+        if (mParam1 == null) {
+            mParam1 = new OrdenDB();
+        }
+
+        mParam1.setActividad(actividad.getText().toString());
+        mParam1.setDescripcion(descripcion.getText().toString());
+        mParam1.setEncargado(encargado.getText().toString());
+        return mParam1;
     }
 
-    public interface PhotographicConsumer {
+    public interface PhotographicLocalConsumer {
         /**
          * for server upload
+         *
          * @param orden
          */
-        public void consumePhotoGraphic(Orden orden);
+        public void consumePhotoGraphic(OrdenDB orden);
 
         /**
          * for local storage
+         *
          * @param orden
          */
-        public void archivarPhotoGraphic(Orden orden);
+        public void archivarPhotoGraphic(OrdenDB orden);
     }
 }

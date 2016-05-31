@@ -15,6 +15,7 @@ import java.util.List;
 import data_activity_fragments.CameraFragment;
 import data_activity_fragments.FotoDialogFragment;
 import de.greenrobot.dao.query.WhereCondition;
+import fotographic_report_fragments.TrabajoFragment;
 import local_Db.DaoMaster;
 import local_Db.DaoSession;
 import local_Db.EquipoDB;
@@ -28,11 +29,13 @@ import local_db_activity_fragments.CameraLocalFragment;
 import local_db_activity_fragments.LocalOrdesFragment;
 import local_db_activity_fragments.OrdenInfoFragment;
 import local_db_activity_fragments.ServicioLocalFragment;
+import local_db_activity_fragments.TrabajoLocalFragment;
 import local_db_activity_fragments.ValueDialogPortableFragment;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import server.OrdenAPI;
+import server.PhotoReportAPI;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.PortableDialogItem;
@@ -46,7 +49,8 @@ import util.navigation.modelos.Orden;
 public class LocalDBActivity extends AppCompatActivity implements Navigator, OnclickLink
         , OrdenInfoFragment.OrdenConsumer, ServicioLocalFragment.HistoryConsumerLocal
         , CameraLocalFragment.PhotosConsumer, ValueDialogPortableFragment.PortableDialogConsumer
-        , PortableDialogItem, FotoDialogFragment.DialogConsumer, CompresImages.CompresConsumer {
+        , PortableDialogItem, FotoDialogFragment.DialogConsumer, CompresImages.CompresConsumer
+        , TrabajoLocalFragment.PhotographicLocalConsumer {
 
     private List<OrdenDB> dataList;
     private OrdenDB current;
@@ -61,6 +65,11 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     private ProgressDialog pg;
     private List<Foto> list;
     //End database objects
+
+    /**
+     * used in photographic
+     */
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +157,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             case "fotos":
                 manager.beginTransaction().replace(R.id.content_local, CameraLocalFragment.newInstance("dadas", "dasda", this), "fotLol").addToBackStack(null).commit();
                 break;
+            case "trabajo":
+                manager.beginTransaction().replace(R.id.content_local, TrabajoLocalFragment.newInstance(current, null)).addToBackStack(null).commit();
+                break;
         }
     }
 
@@ -159,7 +171,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     public void position(int pos) {
         //Toast.makeText(this, dataList.get(pos).getHistorialDetallesDBList2().get(0).getParametro(), Toast.LENGTH_LONG).show();
         current = dataList.get(pos);
-        if (current.getNumeroOrden()!=null) {
+        if (current.getNumeroOrden() != null) {
             current.getHistorialDetallesDBList();
             historial = session.getHistorialDetallesDBDao().queryBuilder().where(HistorialDetallesDBDao.Properties.OrdenId.eq(current.getId())).list();
             fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
@@ -172,7 +184,8 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             //current.setEquipoDB(equi);
             navigate("info_orden");
         } else {
-
+            fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
+            navigate("trabajo");
         }
     }
 
@@ -358,5 +371,55 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     public void consumeDialog(String title, String descripcion) {
         CameraLocalFragment cameraFragment = (CameraLocalFragment) getSupportFragmentManager().findFragmentByTag("fotLol");
         cameraFragment.setPhotoInfo(title, descripcion);
+    }
+
+    @Override
+    public void consumePhotoGraphic(OrdenDB orden) {
+        Log.d("CODIGO_BARRAS", current.getEquipoDB().getCodigoBarras());
+        Orden res = new Orden();
+        res.setDescripcion(orden.getDescripcion());
+        res.setEncargado(orden.getEncargado());
+        res.setActividad(orden.getActividad());
+
+        final ProgressDialog pg = new ProgressDialog(this);
+        pg.setMessage("espera un momento...");
+        pg.setCanceledOnTouchOutside(false);
+        pg.show();
+
+        PhotoReportAPI service = PhotoReportAPI.Factory.getInstance();
+        service.persistOrder(orden.getEquipoDB().getLugarDB().getNombre(), res, new Callback<Orden>() {
+            @Override
+            public void success(Orden orden, Response response) {
+                //Toast.makeText(FotoGraphActivity.this, "exito: " + orden.getIdorden(), Toast.LENGTH_LONG).show();
+                upLoadPicturesObjects(orden.getIdorden(), pg);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                pg.dismiss();
+                Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void archivarPhotoGraphic(OrdenDB orden) {
+        session.getOrdenDBDao().update(current);
+
+        if (fotoList != null) {
+            if (fotoList.size() > 0) {
+                for (int i = 0; i < fotoList.size(); i++) {
+                    FotoDB foto = fotoList.get(i);
+
+                    if (foto.getId() != null) {
+                        session.getFotoDBDao().update(foto);
+                    } else {
+                        foto.setOrdenDB(current);
+                        session.getFotoDBDao().insert(foto);
+                    }
+                }
+            }
+        }
+        closeService();
     }
 }
