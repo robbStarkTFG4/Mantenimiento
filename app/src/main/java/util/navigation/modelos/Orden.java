@@ -131,12 +131,18 @@ public class Orden implements Serializable {
     public OrdenDB transform() {
         OrdenDB orden = new OrdenDB();
         orden.setEncargado(this.getEncargado());
-        orden.setPrioridad(this.getPrioridad());
+        if (this.getPrioridad() != null) {
+            orden.setPrioridad(this.getPrioridad());
+        }
         orden.setActividad(this.getActividad());
         orden.setDescripcion(this.getDescripcion());
-        orden.setStatus(this.getEstatus());
+        if (this.getEstatus() != null) {
+            orden.setStatus(this.getEstatus());
+        }
         orden.setMostrar(false);
-        orden.setNumeroOrden(this.getNumeroOrden());
+        if (this.getNumeroOrden() != null) {
+            orden.setNumeroOrden(this.getNumeroOrden());
+        }
         return orden;
     }
 }

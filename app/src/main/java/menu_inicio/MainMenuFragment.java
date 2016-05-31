@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import mantenimiento.mim.com.mantenimiento.FotoGraphActivity;
 import mantenimiento.mim.com.mantenimiento.LocalDBActivity;
 import mantenimiento.mim.com.mantenimiento.Main;
 import mantenimiento.mim.com.mantenimiento.R;
@@ -55,6 +56,9 @@ public class MainMenuFragment extends Fragment {
             case R.id.archive:
                 Intent intent = new Intent(getContext(), LocalDBActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.repFoto:
+                startActivity(new Intent(getContext(), FotoGraphActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);

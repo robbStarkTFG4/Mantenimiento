@@ -39,7 +39,11 @@
         <activity
             android:name=".LocalDBActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".FotoGraphActivity"
+            android:label="@string/title_activity_foto_graph"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

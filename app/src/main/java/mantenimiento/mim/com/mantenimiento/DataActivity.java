@@ -119,7 +119,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 manager.beginTransaction().replace(R.id.content, ServicioFragment.newInstance(holder, "dad"), "servNet").addToBackStack(null).commit();
                 break;
             case "fotos":
-                manager.beginTransaction().replace(R.id.content, CameraFragment.newInstance("dadas", "dasda", this), "fot").addToBackStack(null).commit();
+                manager.beginTransaction().replace(R.id.content, CameraFragment.newInstance("dadas", "dasda"), "fot").addToBackStack(null).commit();
                 break;
         }
     }

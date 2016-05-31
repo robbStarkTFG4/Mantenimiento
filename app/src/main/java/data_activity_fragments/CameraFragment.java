@@ -88,7 +88,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
      * @return A new instance of fragment CameraFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CameraFragment newInstance(String param1, String param2, Navigator navigator) {
+    public static CameraFragment newInstance(String param1, String param2) {
         CameraFragment fragment = new CameraFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -102,7 +102,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         super.onAttach(context);
         if (context instanceof Navigator) {
             navigator = (Navigator) context;
-            consumer = (DataActivity) context;
+            consumer = (PhotosConsumer) context;
         }
     }
 

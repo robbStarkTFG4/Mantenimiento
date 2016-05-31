@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/fotos_photographic"
+        android:icon="@drawable/camarita"
+        android:title="fotos"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/send_photographic"
+        android:icon="@drawable/send"
+        android:title="send"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/archivar_photographic"
+        android:title="guardar"
+        app:showAsAction="never" />
+
+</menu>

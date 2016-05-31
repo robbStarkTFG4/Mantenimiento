@@ -95,7 +95,7 @@ public class ChooseLineFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 dialog = LineDialogFragment.newInstance(new SerialListHolder(dataList), null);
-                dialog.show(ChooseLineFragment.this.getFragmentManager(), "dasd");
+                dialog.show(ChooseLineFragment.this.getFragmentManager(), "fotoRep");
             }
         });
 
@@ -117,6 +117,11 @@ public class ChooseLineFragment extends Fragment {
         dataList.add(new Lugar("linea 40"));
         dataList.add(new Lugar("linea 50"));
         dataList.add(new Lugar("linea 60"));
+        dataList.add(new Lugar("refrigeracion"));
+        dataList.add(new Lugar("cocimientos"));
+        dataList.add(new Lugar("fermentacion"));
+        dataList.add(new Lugar("reposo"));
+        dataList.add(new Lugar("fuerza motriz"));
     }
 
     @Override

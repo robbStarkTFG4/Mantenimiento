@@ -5,14 +5,14 @@
     <item
         android:id="@+id/fotos"
         android:orderInCategory="200"
-        android:title="Search"
+        android:title="foto"
         android:icon="@drawable/camarita"
         app:showAsAction="ifRoom"
         ></item>
     <item
         android:id="@+id/enviar"
         android:orderInCategory="200"
-        android:title="Search"
+        android:title="enviar"
         android:icon="@drawable/send"
         app:showAsAction="ifRoom"
         ></item>

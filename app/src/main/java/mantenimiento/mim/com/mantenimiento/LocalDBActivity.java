@@ -159,17 +159,21 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     public void position(int pos) {
         //Toast.makeText(this, dataList.get(pos).getHistorialDetallesDBList2().get(0).getParametro(), Toast.LENGTH_LONG).show();
         current = dataList.get(pos);
-        current.getHistorialDetallesDBList();
-        historial = session.getHistorialDetallesDBDao().queryBuilder().where(HistorialDetallesDBDao.Properties.OrdenId.eq(current.getId())).list();
-        fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
-        for (int i = 0; i < fotoList.size(); i++) {
-            FotoDB temp = fotoList.get(i);
-            temp.getOrdenDB();
+        if (current.getNumeroOrden()!=null) {
+            current.getHistorialDetallesDBList();
+            historial = session.getHistorialDetallesDBDao().queryBuilder().where(HistorialDetallesDBDao.Properties.OrdenId.eq(current.getId())).list();
+            fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
+            for (int i = 0; i < fotoList.size(); i++) {
+                FotoDB temp = fotoList.get(i);
+                temp.getOrdenDB();
+            }
+            //EquipoDB equi = current.getEquipoDB();
+            //Log.d("EQUIPO_CODIGO", equi.getCodigoBarras());
+            //current.setEquipoDB(equi);
+            navigate("info_orden");
+        } else {
+
         }
-        //EquipoDB equi = current.getEquipoDB();
-        //Log.d("EQUIPO_CODIGO", equi.getCodigoBarras());
-        //current.setEquipoDB(equi);
-        navigate("info_orden");
     }
 
     @Override
