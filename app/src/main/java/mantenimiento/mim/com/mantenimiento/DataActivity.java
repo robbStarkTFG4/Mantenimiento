@@ -69,14 +69,31 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     private DaoMaster master;
     public DaoSession session;
     private int currentPortablePos;
+    private String codigo = "";
     //End database objects
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        codigo = getIntent().getStringExtra("codigo");
+        if (codigo != null) {
+            getIntent().removeExtra("codigo");
+            Toast.makeText(this, codigo, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
         setUpDB();
-        launchReader();
+
+        //if (codigo == null) {
+            launchReader();
+        //} else {
+          //  getSupportFragmentManager().beginTransaction().replace(R.id.content, BarcodeReaderFragment.newInstance(codigo, null, this)).commit();
+        //}
     }
 
     private void setUpDB() {
@@ -96,7 +113,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
             manager = getSupportFragmentManager();
         }
         manager = getSupportFragmentManager();
-        manager.beginTransaction().replace(R.id.content, BarcodeReaderFragment.newInstance("das", "dad", this)).commit();
+        manager.beginTransaction().replace(R.id.content, BarcodeReaderFragment.newInstance(null, null, this)).commit();
     }
 
     @Override
@@ -107,7 +124,6 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         SerialListHolder holder = new SerialListHolder();
         switch (addres) {
             case "equipo":
-
                 holder.setInformacionFabricantes(factoryList);
                 manager.beginTransaction().replace(R.id.content, EquipmentFragment.newInstance(current, nombreEquipo, holder)).commit();
                 break;

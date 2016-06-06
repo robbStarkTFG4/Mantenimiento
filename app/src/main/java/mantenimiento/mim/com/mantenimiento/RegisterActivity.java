@@ -147,14 +147,12 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
 
     @Override
     public void register(final List<InformacionFabricante> infoList, String numeroEquipo) {
-        /*private ListaNombreEquipos nombreEquipo;
-        private String barCode;
-        private String lineName;*/
+
         Equipo equipo = new Equipo();
         equipo.setNumeroEquipo(numeroEquipo);
         equipo.setCodigoBarras(barCode);
         equipo.setListaNombreEquiposIdlistaNombre(nombreEquipo.getIdlistaNombre());
-        //equipo.setInformacionFabricanteList(infoList);
+
 
         final ProgressDialog pg = new ProgressDialog(this);
         pg.setMessage("registrando espere....");
@@ -184,10 +182,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
             public void success(InformacionFabricante o, Response response) {
                 pg.dismiss();
                 Toast.makeText(RegisterActivity.this, "registrado exitosamente: ", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(RegisterActivity.this, Main.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                closeService();
             }
 
             @Override
@@ -196,5 +191,15 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
                 Toast.makeText(RegisterActivity.this, "falla al registrar inf", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void closeService() {
+        Intent intent = new Intent(RegisterActivity.this, Main.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        Bundle bundle = new Bundle();
+        bundle.putString("codigo", barCode);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        finish();
     }
 }

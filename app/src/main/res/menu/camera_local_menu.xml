@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/camera_attach_dos"
+        android:icon="@drawable/ic_attach_file_black_24dp"
+        android:title="selecciona foto"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/camera_foto_local"
         android:title="foto"
         app:showAsAction="never" />

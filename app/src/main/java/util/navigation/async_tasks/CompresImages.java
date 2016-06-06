@@ -43,7 +43,7 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
                 try {
                     File rep = new File(ruta);
                     OutputStream stream = new FileOutputStream(rep);
-                    bit.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+                    bit.compress(Bitmap.CompressFormat.JPEG, 60, stream);
                     stream.flush();
                     stream.close();
                     Log.d("ASYNC_TASK", rep.getName());

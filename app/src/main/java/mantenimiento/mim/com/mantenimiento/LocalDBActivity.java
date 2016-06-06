@@ -255,7 +255,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             FotoDB temp = fotoList.get(i);
             list.add(new Foto(temp.getArchivo(), temp.getTitulo(), temp.getDescripcion()));
         }
-        if (list != null) {
+        if (list.size() > 0) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
             service.persistPhotoObjects(idorden, list, new Callback<Foto>() {
                 @Override

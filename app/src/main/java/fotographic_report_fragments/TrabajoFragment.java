@@ -62,7 +62,7 @@ public class TrabajoFragment extends Fragment {
         TrabajoFragment fragment = new TrabajoFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, param1);
-        args.putLong(ARG_PARAM2, param2);
+        //args.putLong(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }

@@ -4,7 +4,10 @@ package local_db_activity_fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -22,7 +25,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,6 +39,7 @@ import data_activity_fragments.ImageViewFragment;
 import local_Db.FotoDB;
 import mantenimiento.mim.com.mantenimiento.DataActivity;
 import mantenimiento.mim.com.mantenimiento.R;
+import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.adapter.FotosAdapter;
 import util.navigation.adapter.FotosLocalAdapter;
@@ -44,6 +52,9 @@ import util.navigation.modelos.Foto;
  * create an instance of this fragment.
  */
 public class CameraLocalFragment extends Fragment implements FotosAdapter.PositionConsumer, FotosLocalAdapter.PositionConsumer {
+    private boolean control = false;
+    private final int SELECT_PHOTO = 290;
+
     @Override
     public void position(int position) {
         ImageViewFragment dialog = ImageViewFragment.newInstance(dataList.get(position).getArchivo(), null);
@@ -152,6 +163,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.camera_local_menu, menu);
+        Modifier.changeMenuItemColor(menu);
     }
 
     @Override
@@ -160,8 +172,18 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
             case R.id.camera_foto_local:
                 cameraIntent();
                 break;
+            case R.id.camera_attach_dos:
+                pickPhoto();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void pickPhoto() {
+        control = false;
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
     }
 
     private void dataSetUp() {
@@ -229,20 +251,77 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == ((Activity) getContext()).RESULT_OK) {
-                FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
-                foto.show(getFragmentManager(), "dialog2");
+        switch (requestCode) {
+            case REQUEST_IMAGE_CAPTURE:
+                imageResult(resultCode);
+                break;
+            case SELECT_PHOTO:
+                if (resultCode == ((Activity) getContext()).RESULT_OK) {
+                    try {
+                        final Uri imageUri = data.getData();
+                        final InputStream imageStream = ((Activity) getContext()).getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 
-            } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
-                // User cancelled the image capture
-                if (ruta != null) {
-                    //Toast.makeText(getContext(), "borra archivo", Toast.LENGTH_LONG).show();
+                        //selectedImage.setConfig(matrix);
+
+
+                        final File imageFile = createImageFile();
+
+                        new AsyncTask<Void, Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    OutputStream stream = new FileOutputStream(imageFile);
+                                    selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                                    stream.flush();
+                                    stream.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                super.onPostExecute(aVoid);
+                                notifyChange();
+                            }
+                        }.execute();
+
+
+                        FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+                        foto.show(getFragmentManager(), "dialog");
+                        ruta = imageFile.getPath();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-            } else {
-                // Image capture failed, advise user
-            }
+                break;
         }
+    }
+
+    private void imageResult(int resultCode) {
+        if (resultCode == ((Activity) getContext()).RESULT_OK) {
+            control = true;
+            FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+            foto.show(getFragmentManager(), "dialog");
+
+        } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
+            // User cancelled the image capture
+            if (ruta != null) {
+                Toast.makeText(getContext(), "borra archivo", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            // Image capture failed, advise user
+        }
+    }
+
+    private void notifyChange() {
+        mAdapter.notifyDataSetChanged();
     }
 
     private void recyclerSetUp(View view) {

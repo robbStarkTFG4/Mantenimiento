@@ -42,7 +42,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".FotoGraphActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_foto_graph"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

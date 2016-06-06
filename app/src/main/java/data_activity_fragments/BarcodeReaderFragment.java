@@ -122,7 +122,11 @@ public class BarcodeReaderFragment extends Fragment {
             }
         });
 
-        barcodeReader();
+        if (mParam1 == null) {
+            barcodeReader();
+        } else {
+            searchEquipment(mParam1);
+        }
 
         return view;
     }

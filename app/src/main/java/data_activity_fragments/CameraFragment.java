@@ -4,12 +4,21 @@ package data_activity_fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,13 +32,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import mantenimiento.mim.com.mantenimiento.DataActivity;
 import mantenimiento.mim.com.mantenimiento.R;
+import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.adapter.FotosAdapter;
 import util.navigation.custom.recycler.RecyclerViewEmpty;
@@ -41,6 +55,9 @@ import util.navigation.modelos.Foto;
  * create an instance of this fragment.
  */
 public class CameraFragment extends Fragment implements FotosAdapter.PositionConsumer {
+    private final int SELECT_PHOTO = 199;
+    private boolean control = false;
+
     @Override
     public void position(int position) {
         ImageViewFragment dialog = ImageViewFragment.newInstance(dataList.get(position).getArchivo(), null);
@@ -74,6 +91,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
     private PhotosConsumer consumer;
 
     public static final int REQUEST_IMAGE_CAPTURE = 4231;
+    public static final int REQUEST_CAMERA_RESULT = 19123;
 
     public CameraFragment() {
         // Required empty public constructor
@@ -149,16 +167,49 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_camera, menu);
+        Modifier.changeMenuItemColor(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.camera_foto:
-                cameraIntent();
+                CameraManager cameraManager = (CameraManager)(getContext()). getSystemService(Context.CAMERA_SERVICE);
+                try {
+                    //Log.v("CAMERA", mCameraId + " " + mCameraDeviceStateCallback);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                        if(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED){
+                            cameraIntent();
+                        }
+                        else {
+                            if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)){
+                                Toast.makeText(getContext(),"No Permission to use the Camera services", Toast.LENGTH_SHORT).show();
+                            }
+                            requestPermissions(new String[] {android.Manifest.permission.CAMERA},REQUEST_CAMERA_RESULT);
+                        }
+                    }
+                    else {
+                        cameraIntent();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            case R.id.camera_attach:
+                pickPhoto();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void pickPhoto() {
+        control = false;
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+
     }
 
     private void dataSetUp() {
@@ -226,19 +277,74 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == ((Activity) getContext()).RESULT_OK) {
-                FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
-                foto.show(getFragmentManager(), "dialog");
+        switch (requestCode) {
+            case REQUEST_IMAGE_CAPTURE:
+                imageResult(resultCode);
+                break;
+            case SELECT_PHOTO:
+                if (resultCode == ((Activity) getContext()).RESULT_OK) {
+                    try {
+                        final Uri imageUri = data.getData();
+                        final InputStream imageStream = ((Activity) getContext()).getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 
-            } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
-                // User cancelled the image capture
-                if (ruta != null) {
-                    Toast.makeText(getContext(), "borra archivo", Toast.LENGTH_LONG).show();
+
+                        final File imageFile = createImageFile();
+
+                        new AsyncTask<Void, Void, Void>() {
+
+                            @Override
+                            protected Void doInBackground(Void... params) {
+                                try {
+                                    OutputStream stream = new FileOutputStream(imageFile);
+                                    selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                                    stream.flush();
+                                    stream.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                super.onPostExecute(aVoid);
+                                notifyChange();
+                            }
+                        }.execute();
+
+
+                        FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+                        foto.show(getFragmentManager(), "dialog");
+                        ruta = imageFile.getPath();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-            } else {
-                // Image capture failed, advise user
+                break;
+        }
+    }
+
+    private void notifyChange() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void imageResult(int resultCode) {
+        if (resultCode == ((Activity) getContext()).RESULT_OK) {
+            control = true;
+            FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+            foto.show(getFragmentManager(), "dialog");
+
+        } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
+            // User cancelled the image capture
+            if (ruta != null) {
+                Toast.makeText(getContext(), "borra archivo", Toast.LENGTH_LONG).show();
             }
+        } else {
+            // Image capture failed, advise user
         }
     }
 
@@ -266,8 +372,9 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         current.setTitulo(title);
         current.setDescripcion(descripcion);
         dataList.add(current);
-        //current = new Foto();
-        mAdapter.notifyDataSetChanged();
+        //if (control) {
+            mAdapter.notifyDataSetChanged();
+        //}
     }
 
 }

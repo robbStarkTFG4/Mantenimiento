@@ -2,9 +2,11 @@ package mantenimiento.mim.com.mantenimiento;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -105,6 +107,21 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case  CameraFragment.REQUEST_CAMERA_RESULT:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "Cannot run application because camera service permission have not been granted", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
+    }
+
+    @Override
     public void tipoEquipo(ListaNombreEquipos tip) {
     }
 
@@ -152,13 +169,17 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
             @Override
             public void success(Orden orden, Response response) {
                 //Toast.makeText(FotoGraphActivity.this, "exito: " + orden.getIdorden(), Toast.LENGTH_LONG).show();
-                uploadPictures(orden.getIdorden(), pg);
+                if (FotoGraphActivity.this != null) {
+                    uploadPictures(orden.getIdorden(), pg);
+                }
             }
 
             @Override
             public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                if (FotoGraphActivity.this != null) {
+                    pg.dismiss();
+                    Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -177,8 +198,6 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
         equi.setNumeroEquipo("n/a");
         equi.setCodigoBarras("n/a");
         equi.setListaNombreEquipoIdListaNombre(7);
-
-
 
 
         final List<FotoDB> fotoList = new ArrayList<>();
