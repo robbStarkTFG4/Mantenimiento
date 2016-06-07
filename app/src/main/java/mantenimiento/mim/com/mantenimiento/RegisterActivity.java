@@ -2,7 +2,7 @@ package mantenimiento.mim.com.mantenimiento;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.multidex.MultiDex;
+//import android.support.multidex.MultiDex;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,7 +41,7 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MultiDex.install(this);
+        //MultiDex.install(this);
         setContentView(R.layout.activity_register);
 
         FragmentManager manager = getSupportFragmentManager();

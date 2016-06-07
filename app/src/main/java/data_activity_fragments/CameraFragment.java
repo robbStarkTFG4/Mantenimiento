@@ -174,7 +174,6 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.camera_foto:
-                CameraManager cameraManager = (CameraManager)(getContext()). getSystemService(Context.CAMERA_SERVICE);
                 try {
                     //Log.v("CAMERA", mCameraId + " " + mCameraDeviceStateCallback);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -194,6 +193,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+
                 }
 
                 break;
