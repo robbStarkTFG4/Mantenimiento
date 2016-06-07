@@ -3,19 +3,23 @@ package mantenimiento.mim.com.mantenimiento;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.itextpdf.text.DocumentException;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import data_activity_fragments.CameraFragment;
 import data_activity_fragments.FotoDialogFragment;
-import de.greenrobot.dao.query.WhereCondition;
-import fotographic_report_fragments.TrabajoFragment;
 import local_Db.DaoMaster;
 import local_Db.DaoSession;
 import local_Db.EquipoDB;
@@ -41,6 +45,7 @@ import util.navigation.OnclickLink;
 import util.navigation.PortableDialogItem;
 import util.navigation.SerialListHolder;
 import util.navigation.async_tasks.CompresImages;
+import util.navigation.async_tasks.ReportBuilder;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
 import util.navigation.modelos.ListaNombreEquipos;
@@ -421,5 +426,21 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             }
         }
         closeService();
+    }
+
+    public void buildReportLocal() throws IOException {
+        //Toast.makeText(this, "init build", Toast.LENGTH_LONG).show();
+
+        InputStream ims = getAssets().open("logo.png");
+        Bitmap bmp = BitmapFactory.decodeStream(ims);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        try {
+            ReportBuilder builder = new ReportBuilder(this, current, historial, fotoList, current.getEquipoDB(), current.getEquipoDB().getLugarDB(), stream.toByteArray());
+            builder.execute();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        //document.add(image);
     }
 }

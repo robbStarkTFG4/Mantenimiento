@@ -14,7 +14,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.itextpdf.text.BadElementException;
+
+import java.io.IOException;
 import java.util.List;
 
 import local_Db.HistorialDetallesDB;
@@ -159,6 +163,16 @@ public class ServicioLocalFragment extends Fragment {
                         }).create();
                 alert2.show();
                 break;
+            case R.id.build_service_local:
+                consumer.consume(dataList);
+                try {
+                    consumer.buildReportLocal();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (BadElementException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -183,5 +197,7 @@ public class ServicioLocalFragment extends Fragment {
         public void upload();
 
         public void update();
+
+        public void buildReportLocal() throws IOException, BadElementException;
     }
 }

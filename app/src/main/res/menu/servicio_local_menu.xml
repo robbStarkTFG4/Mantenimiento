@@ -4,21 +4,25 @@
 
     <item
         android:id="@+id/fotos_local"
+        android:icon="@drawable/camarita"
         android:orderInCategory="200"
         android:title="Search"
-        android:icon="@drawable/camarita"
-        app:showAsAction="ifRoom"
-        ></item>
+        app:showAsAction="ifRoom"></item>
     <item
         android:id="@+id/enviar_local"
+        android:icon="@drawable/send"
         android:orderInCategory="200"
         android:title="Search"
-        android:icon="@drawable/send"
-        app:showAsAction="ifRoom"
-        ></item>
-    <item android:id="@+id/archiva_service_local"
+        app:showAsAction="ifRoom"></item>
+    <item
+        android:id="@+id/archiva_service_local"
         android:orderInCategory="200"
         android:title="guardar"
+        app:showAsAction="never"></item>
+    <item
+        android:id="@+id/build_service_local"
+        android:orderInCategory="200"
+        android:title="crear localmente"
         app:showAsAction="never"></item>
 
 </menu>
