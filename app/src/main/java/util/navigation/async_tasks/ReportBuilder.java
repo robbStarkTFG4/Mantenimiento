@@ -44,7 +44,7 @@ public class ReportBuilder extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
-            new ReporteEnvasado(orden, observaciones, fotos, equipo, lugar, imageBytes);
+            new ReporteEnvasado(context, orden, observaciones, fotos, equipo, lugar, imageBytes);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,10 +58,12 @@ public class ReportBuilder extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-        if (aBoolean) {
-            Toast.makeText(context, "reporte creado", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, "hubo algun error", Toast.LENGTH_LONG).show();
+        if (context != null) {
+            if (aBoolean) {
+                Toast.makeText(context, "reporte creado", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "hubo algun error", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

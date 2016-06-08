@@ -170,6 +170,7 @@ public class TrabajoFragment extends Fragment {
                     Toast.makeText(getContext(), "llena todos los datos", Toast.LENGTH_SHORT).show();
                 }
                 break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -191,12 +192,14 @@ public class TrabajoFragment extends Fragment {
     public interface PhotographicConsumer {
         /**
          * for server upload
+         *
          * @param orden
          */
         public void consumePhotoGraphic(Orden orden);
 
         /**
          * for local storage
+         *
          * @param orden
          */
         public void archivarPhotoGraphic(Orden orden);

@@ -16,6 +16,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.itextpdf.text.BadElementException;
+
+import java.io.IOException;
+
 import local_Db.OrdenDB;
 import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Modifier;
@@ -115,7 +119,7 @@ public class TrabajoLocalFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.photographic_menu, menu);
+        inflater.inflate(R.menu.photographic_loca_menu, menu);
         Modifier.changeMenuItemColor(menu);
     }
 
@@ -168,6 +172,20 @@ public class TrabajoLocalFragment extends Fragment {
                     Toast.makeText(getContext(), "llena todos los datos", Toast.LENGTH_SHORT).show();
                 }
                 break;
+
+            case R.id.build_photographicl:
+                if (validateForm()) {
+                    try {
+                        consumer.buildReportLocal();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (BadElementException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "llena todos los datos", Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -204,5 +222,7 @@ public class TrabajoLocalFragment extends Fragment {
          * @param orden
          */
         public void archivarPhotoGraphic(OrdenDB orden);
+
+        public void buildReportLocal() throws IOException, BadElementException;
     }
 }

@@ -4,6 +4,9 @@ package report_generator;
  * Created by marcoisaac on 6/6/2016.
  */
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 
 import com.itextpdf.text.BadElementException;
@@ -17,10 +20,14 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +46,7 @@ import local_Db.OrdenDB;
 public class ReporteEnvasado {
 
 
+    private Context context;
     private OrdenDB orden;
     private final List<HistorialDetallesDB> observaciones = new ArrayList<>();
     private List<FotoDB> fotos;
@@ -46,18 +54,21 @@ public class ReporteEnvasado {
     private LugarDB lugar;
     private byte[] imageBytes;
 
-    public ReporteEnvasado(OrdenDB orden, List<HistorialDetallesDB> observaciones, List<FotoDB> fotos, EquipoDB equipo, LugarDB lugar, byte[] imageBytes) throws IOException, FileNotFoundException, DocumentException {
+    public ReporteEnvasado(Context context, OrdenDB orden, List<HistorialDetallesDB> observaciones, List<FotoDB> fotos, EquipoDB equipo, LugarDB lugar, byte[] imageBytes) throws IOException, FileNotFoundException, DocumentException {
 
+        this.context = context;
         this.orden = orden;
         this.equipo = equipo;
         this.lugar = lugar;
         this.fotos = fotos;
         this.imageBytes = imageBytes;
 
-        for (HistorialDetallesDB hs : observaciones) {
-            if (hs.getValor() != null) {
-                if (hs.getValor().length() > 0) {
-                    this.observaciones.add(hs);
+        if (observaciones != null) {
+            for (HistorialDetallesDB hs : observaciones) {
+                if (hs.getValor() != null) {
+                    if (hs.getValor().length() > 0) {
+                        this.observaciones.add(hs);
+                    }
                 }
             }
         }
@@ -76,13 +87,17 @@ public class ReporteEnvasado {
         }
 
 
+        if (orden.getNumeroOrden() == null) {
+            orden.setNumeroOrden(orden.getActividad());
+        }
+
         PdfWriter.getInstance(document,
                 new FileOutputStream(Environment.  //THIS WORKS
                         getExternalStorageDirectory() + "/reportesMim" + "/" + orden.getNumeroOrden() + ".pdf"));
 
-        document.open();
 
         document.open();
+
 
         PdfPTable table = new PdfPTable(8);
 
@@ -149,8 +164,7 @@ public class ReporteEnvasado {
         infHeader.addCell(fechaLabel);
         infHeader.addCell(fechaValue);
 
-        PdfPCell cellHeaderRight
-                = new PdfPCell(infHeader);
+        PdfPCell cellHeaderRight = new PdfPCell(infHeader);
         cellHeaderRight.setColspan(4);
         //END HEADER
 
@@ -175,7 +189,14 @@ public class ReporteEnvasado {
         responsableLabel.setPaddingTop(5);
         responsableLabel.setColspan(3);
 
-        PdfPCell areaValor = new PdfPCell(new Paragraph("envasado"));
+        String area;
+        if (lugar.getNombre().contains("linea")) {
+            area = "envasado";
+        } else {
+            area = "elaboracion";
+        }
+
+        PdfPCell areaValor = new PdfPCell(new Paragraph(area));
         areaValor.setFixedHeight(25);
         areaValor.setHorizontalAlignment(Element.ALIGN_CENTER);
         areaValor.setColspan(2);
@@ -335,10 +356,14 @@ public class ReporteEnvasado {
                 infiCell.setColspan(3);
                 infiCell.addElement(infoTable);
 
-                //Table collumn
-                //String[] splits = foto.getArchivo().split("/");
-                //int size = splits.length;
+                File file = new File(foto.getArchivo());
+
+                /*InputStream st = new BufferedInputStream(new FileInputStream(file));
+                Bitmap bmp = BitmapFactory.decodeStream(st);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);*/
                 Image imgFoto = Image.getInstance(foto.getArchivo());
+                //Image imgFoto = Image.getInstance(stream.toByteArray());
 
                 PdfPTable imagenTable = new PdfPTable(1);
 

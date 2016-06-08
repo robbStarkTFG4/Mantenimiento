@@ -18,5 +18,9 @@
         android:title="guardar"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/build_photographicl"
+        android:title="crear localmente"
+        app:showAsAction="never" />
 
 </menu>
