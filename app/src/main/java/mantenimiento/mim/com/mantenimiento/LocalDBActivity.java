@@ -183,17 +183,22 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         //Toast.makeText(this, dataList.get(pos).getHistorialDetallesDBList2().get(0).getParametro(), Toast.LENGTH_LONG).show();
         current = dataList.get(pos);
         if ((current.getNumeroOrden() != null) && (current.getPrioridad() != null)) {
-            current.getHistorialDetallesDBList();
-            historial = session.getHistorialDetallesDBDao().queryBuilder().where(HistorialDetallesDBDao.Properties.OrdenId.eq(current.getId())).list();
-            fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
-            for (int i = 0; i < fotoList.size(); i++) {
-                FotoDB temp = fotoList.get(i);
-                temp.getOrdenDB();
+            if (current.getPrioridad().equals("")) {
+                fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
+                navigate("trabajo");
+            } else {
+                current.getHistorialDetallesDBList();
+                historial = session.getHistorialDetallesDBDao().queryBuilder().where(HistorialDetallesDBDao.Properties.OrdenId.eq(current.getId())).list();
+                fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
+                for (int i = 0; i < fotoList.size(); i++) {
+                    FotoDB temp = fotoList.get(i);
+                    temp.getOrdenDB();
+                }
+                navigate("info_orden");
             }
             //EquipoDB equi = current.getEquipoDB();
             //Log.d("EQUIPO_CODIGO", equi.getCodigoBarras());
             //current.setEquipoDB(equi);
-            navigate("info_orden");
         } else {
             fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
             navigate("trabajo");
@@ -493,6 +498,15 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                         foto.setOrdenDB(current);
                         session.getFotoDBDao().insert(foto);
                     }
+                }
+            }
+        }
+
+        if (blackList != null) {
+            Log.d("HAY ELEMENTOS", "ELEMENTOS");
+            if (blackList.size() > 0) {
+                for (FotoDB ft : blackList) {
+                    session.getFotoDBDao().delete(ft);
                 }
             }
         }

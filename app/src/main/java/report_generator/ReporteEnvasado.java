@@ -86,14 +86,16 @@ public class ReporteEnvasado {
             reporteDir.mkdir();
         }
 
-
+        String nombre;
         if (orden.getNumeroOrden() == null) {
-            orden.setNumeroOrden(orden.getActividad());
+            nombre = orden.getActividad();
+        } else {
+            nombre = orden.getNumeroOrden();
         }
 
         PdfWriter.getInstance(document,
                 new FileOutputStream(Environment.  //THIS WORKS
-                        getExternalStorageDirectory() + "/reportesMim" + "/" + orden.getNumeroOrden() + ".pdf"));
+                        getExternalStorageDirectory() + "/reportesMim" + "/" + nombre + ".pdf"));
 
 
         document.open();
