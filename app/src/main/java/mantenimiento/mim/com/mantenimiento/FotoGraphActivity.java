@@ -109,9 +109,9 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case  CameraFragment.REQUEST_CAMERA_RESULT:
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED){
+        switch (requestCode) {
+            case CameraFragment.REQUEST_CAMERA_RESULT:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Cannot run application because camera service permission have not been granted", Toast.LENGTH_SHORT).show();
                 }
                 break;
@@ -157,6 +157,10 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     }
 
     @Override
+    public void updateModel(String title, String descripcion, int posicion) {
+    }
+
+    @Override
     public void consumePhotoGraphic(Orden orden) {
 
         pg = new ProgressDialog(this);
@@ -183,6 +187,12 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.close();
     }
 
     @Override
@@ -281,7 +291,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     private void fileUpload() {
         if (photoList != null) {
             if (photoList.size() > 0) {
-                CompresImages task = new CompresImages(this);
+                CompresImages task = new CompresImages(this, 0);
                 Foto[] array = new Foto[photoList.size()];
                 for (int i = 0; i < photoList.size(); i++) {
                     array[i] = photoList.get(i);
@@ -292,7 +302,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     }
 
     @Override
-    public void compresResult(boolean res) {
+    public void compresResult(boolean res, int codigo) {
         if (res) {
             pg.dismiss();
             Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();

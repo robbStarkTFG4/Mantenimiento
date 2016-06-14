@@ -10,4 +10,10 @@
         android:id="@+id/camera_foto_local"
         android:title="foto"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/delete_camera_local"
+        android:icon="@drawable/ic_trash"
+        android:title="borrrar seleccion"
+        android:visible="false"
+        app:showAsAction="ifRoom" />
 </menu>

@@ -90,9 +90,9 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         setUpDB();
 
         //if (codigo == null) {
-            launchReader();
+        launchReader();
         //} else {
-          //  getSupportFragmentManager().beginTransaction().replace(R.id.content, BarcodeReaderFragment.newInstance(codigo, null, this)).commit();
+        //  getSupportFragmentManager().beginTransaction().replace(R.id.content, BarcodeReaderFragment.newInstance(codigo, null, this)).commit();
         //}
     }
 
@@ -141,6 +141,12 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.close();
+    }
+
+    @Override
     public void tipoEquipo(ListaNombreEquipos tip) {
     }
 
@@ -148,6 +154,11 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     public void consumeDialog(String title, String descripcion) {
         CameraFragment cameraFragment = (CameraFragment) getSupportFragmentManager().findFragmentByTag("fot");
         cameraFragment.setPhotoInfo(title, descripcion);
+    }
+
+    @Override
+    public void updateModel(String title, String descripcion, int posicion) {
+
     }
 
     @Override
@@ -349,7 +360,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     private void fileUpload() {
         if (list != null) {
             if (list.size() > 0) {
-                CompresImages task = new CompresImages(this);
+                CompresImages task = new CompresImages(this, 0);
                 Foto[] array = new Foto[list.size()];
                 for (int i = 0; i < list.size(); i++) {
                     array[i] = list.get(i);
@@ -360,14 +371,14 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     }
 
     @Override
-    public void compresResult(boolean res) {
+    public void compresResult(boolean res, int codigo) {
         if (res) {
             pg.dismiss();
-            Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Reporte procesado", Toast.LENGTH_SHORT).show();
             Log.d("RESULTADO_COMPRESION: ", "funciono");
             closeService();
         } else {
-            Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Fallo en compresion", Toast.LENGTH_SHORT).show();
             Log.d("RESULTADO_COMPRESION: ", "fallo");
         }
     }

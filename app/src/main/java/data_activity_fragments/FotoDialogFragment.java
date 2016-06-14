@@ -30,16 +30,20 @@ public class FotoDialogFragment extends DialogFragment {
 
     public interface DialogConsumer {
         public void consumeDialog(String title, String descripcion);
+
+        public void updateModel(String title, String descripcion, int posicion);
     }
 
     DialogConsumer consumer;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String POSICION = "ADSDCX";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String mParam1 = null;
+    private String mParam2 = null;
+    private int pos;
 
     public FotoDialogFragment() {
         // Required empty public constructor
@@ -54,11 +58,12 @@ public class FotoDialogFragment extends DialogFragment {
      * @return A new instance of fragment FotoDialogFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static FotoDialogFragment newInstance(String param1, String param2) {
+    public static FotoDialogFragment newInstance(String param1, String param2, int position) {
         FotoDialogFragment fragment = new FotoDialogFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+        args.putInt(POSICION, position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,6 +74,7 @@ public class FotoDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            pos = getArguments().getInt(POSICION);
         }
     }
 
@@ -101,13 +107,24 @@ public class FotoDialogFragment extends DialogFragment {
     private void controlSetUp(View view) {
         final EditText titleField = (EditText) view.findViewById(R.id.titleDialog);
         final EditText descriptionField = (EditText) view.findViewById(R.id.descriptionDialog);
+
+        if (!(mParam1 == null && mParam2 == null)) {
+            titleField.setText(mParam1);
+            descriptionField.setText(mParam2);
+        }
+
         Button aceptar = (Button) view.findViewById(R.id.aceptar_btn);
         aceptar.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (titleField.getText().toString().length() > 0 && descriptionField.getText().toString().length() > 0) {
                     if (consumer != null) {
-                        consumer.consumeDialog(titleField.getText().toString(), descriptionField.getText().toString());
+                        if (mParam1 == null && mParam2 == null) {
+                            consumer.consumeDialog(titleField.getText().toString(), descriptionField.getText().toString());
+                        } else {
+                            //editando objeto
+                            consumer.updateModel(titleField.getText().toString(), descriptionField.getText().toString(), pos);
+                        }
                     }
                     FotoDialogFragment.this.dismiss();
                 }

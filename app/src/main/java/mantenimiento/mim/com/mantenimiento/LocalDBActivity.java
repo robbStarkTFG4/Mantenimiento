@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.itextpdf.text.DocumentException;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -57,6 +58,8 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         , PortableDialogItem, FotoDialogFragment.DialogConsumer, CompresImages.CompresConsumer
         , TrabajoLocalFragment.PhotographicLocalConsumer {
 
+    private Boolean action_mode = false;
+
     private List<OrdenDB> dataList;
     private OrdenDB current;
     private List<HistorialDetallesDB> historial;
@@ -69,6 +72,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     private int currentItem;
     private ProgressDialog pg;
     private List<Foto> list;
+    private List<FotoDB> blackList;
     //End database objects
 
     /**
@@ -176,7 +180,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     public void position(int pos) {
         //Toast.makeText(this, dataList.get(pos).getHistorialDetallesDBList2().get(0).getParametro(), Toast.LENGTH_LONG).show();
         current = dataList.get(pos);
-        if (current.getNumeroOrden() != null) {
+        if ((current.getNumeroOrden() != null) && (current.getPrioridad() != null)) {
             current.getHistorialDetallesDBList();
             historial = session.getHistorialDetallesDBDao().queryBuilder().where(HistorialDetallesDBDao.Properties.OrdenId.eq(current.getId())).list();
             fotoList = session.getFotoDBDao().queryBuilder().where(FotoDBDao.Properties.IdOrden.eq(current.getId())).list();
@@ -231,6 +235,12 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.close();
     }
 
     private void upLoadHistoryDetails(final Integer idorden, final ProgressDialog pg) {
@@ -289,7 +299,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     private void fileUpload() {
         if (list != null) {
             if (list.size() > 0) {
-                CompresImages task = new CompresImages(this);
+                CompresImages task = new CompresImages(this, 0);
                 Foto[] array = new Foto[list.size()];
                 for (int i = 0; i < list.size(); i++) {
                     array[i] = list.get(i);
@@ -300,17 +310,44 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     }
 
     @Override
-    public void compresResult(boolean res) {
-        if (res) {
-            current.setMostrar(true);
-            session.getOrdenDBDao().update(current);
-            pg.dismiss();
-            Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-            Log.d("RESULTADO_COMPRESION: ", "funciono");
-            closeService();
+    public void compresResult(boolean res, int codigo) {
+        Log.d("comprees", "result: " + res + "  codigo: " + codigo);
+        if (codigo == 0) {
+            if (res) {
+                current.setMostrar(true);
+                session.getOrdenDBDao().update(current);
+                pg.dismiss();
+                Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                Log.d("RESULTADO_COMPRESION: ", "funciono");
+                closeService();
+            } else {
+                Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
+                Log.d("RESULTADO_COMPRESION: ", "fallo");
+            }
         } else {
-            Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
-            Log.d("RESULTADO_COMPRESION: ", "fallo");
+            if (res) {
+                reportGen();
+            } else {
+                Toast.makeText(this, "hubo algun error", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void reportGen() {
+        try {
+            InputStream ims = getAssets().open("logo.png");
+            Bitmap bmp = BitmapFactory.decodeStream(ims);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+            ReportBuilder builder = new ReportBuilder(this, current, historial, fotoList, current.getEquipoDB(), current.getEquipoDB().getLugarDB(), stream.toByteArray());
+            builder.execute();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -337,6 +374,16 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 }
             }
         }
+
+        if (blackList != null) {
+            Log.d("HAY ELEMENTOS", "ELEMENTOS");
+            if (blackList.size() > 0) {
+                for (FotoDB ft : blackList) {
+                    session.getFotoDBDao().delete(ft);
+                }
+            }
+        }
+
         closeService();
     }
 
@@ -347,8 +394,23 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     }
 
     @Override
+    public void setBlackList(List<FotoDB> blackList) {
+        this.blackList = blackList;
+    }
+
+    @Override
     public List<FotoDB> getPhotosList() {
         return fotoList;
+    }
+
+    @Override
+    public void setActionMode(boolean mode) {
+        action_mode = mode;
+    }
+
+    @Override
+    public boolean isActionMode() {
+        return action_mode;
     }
 
     private void closeService() {
@@ -376,6 +438,12 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     public void consumeDialog(String title, String descripcion) {
         CameraLocalFragment cameraFragment = (CameraLocalFragment) getSupportFragmentManager().findFragmentByTag("fotLol");
         cameraFragment.setPhotoInfo(title, descripcion);
+    }
+
+    @Override
+    public void updateModel(String title, String descripcion, int posicion) {
+        CameraLocalFragment frag = (CameraLocalFragment) getSupportFragmentManager().findFragmentByTag("fotLol");
+        frag.editModel(title, descripcion, posicion);
     }
 
     @Override
@@ -429,18 +497,43 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     }
 
     public void buildReportLocal() throws IOException {
-        //Toast.makeText(this, "init build", Toast.LENGTH_LONG).show();
+        Log.d("init", "building....");
 
-        InputStream ims = getAssets().open("logo.png");
-        Bitmap bmp = BitmapFactory.decodeStream(ims);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        try {
-            ReportBuilder builder = new ReportBuilder(this, current, historial, fotoList, current.getEquipoDB(), current.getEquipoDB().getLugarDB(), stream.toByteArray());
-            builder.execute();
-        } catch (DocumentException e) {
-            e.printStackTrace();
+        if (fotoList != null) {
+            Log.d("point", "list is not null....");
+            if (fotoList.size() > 0) {
+                Log.d("point", "launch task....");
+                List<Foto> list = new ArrayList<>();
+                for (int i = 0; i < fotoList.size(); i++) {
+                    FotoDB temp = fotoList.get(i);
+                    list.add(new Foto(temp.getArchivo(), temp.getTitulo(), temp.getDescripcion()));
+                }
+                CompresImages task = new CompresImages(this, 2);
+                Foto[] array = new Foto[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    array[i] = list.get(i);
+                }
+                task.execute(array);
+            } else {
+                reportGen();
+            }
+        } else {
+            Log.d("point", "null list ....");
+            reportGen();
         }
-        //document.add(image);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (action_mode) {
+            action_mode = false;
+            Log.d("MODO: ", "ACTION_MODE_ON");
+            CameraLocalFragment frag = (CameraLocalFragment) getSupportFragmentManager().findFragmentByTag("fotLol");
+            if (frag != null) {
+                frag.closeActionMode();
+            }
+        } else {
+            super.onBackPressed();
+        }
     }
 }

@@ -37,38 +37,27 @@ import java.util.Random;
 import data_activity_fragments.FotoDialogFragment;
 import data_activity_fragments.ImageViewFragment;
 import local_Db.FotoDB;
-import mantenimiento.mim.com.mantenimiento.DataActivity;
 import mantenimiento.mim.com.mantenimiento.R;
+import util.navigation.BlackBasket;
 import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.adapter.FotosAdapter;
 import util.navigation.adapter.FotosLocalAdapter;
 import util.navigation.custom.recycler.RecyclerViewEmpty;
-import util.navigation.modelos.Foto;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link CameraLocalFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CameraLocalFragment extends Fragment implements FotosAdapter.PositionConsumer, FotosLocalAdapter.PositionConsumer {
+public class CameraLocalFragment extends Fragment implements FotosAdapter.PositionConsumer
+        , FotosLocalAdapter.PositionConsumer, BlackBasket {
+
+    private Menu menu;
     private boolean control = false;
     private final int SELECT_PHOTO = 290;
 
-    @Override
-    public void position(int position) {
-        ImageViewFragment dialog = ImageViewFragment.newInstance(dataList.get(position).getArchivo(), null);
-        dialog.show(getFragmentManager(), "imgDialog");
-    }
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-
-    public interface PhotosConsumer {
-        public void setPhotosList(List<FotoDB> list);
-
-        public List<FotoDB> getPhotosList();
-    }
-
+    private Boolean showCheck = false;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -82,6 +71,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     private RecyclerViewEmpty.LayoutManager mLayoutManager;
 
     private List<FotoDB> dataList = new ArrayList<>();
+    private List<FotoDB> blackList = new ArrayList<>();
     private FloatingActionButton floatButton;
     private String ruta;
 
@@ -121,6 +111,13 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     }
 
     @Override
+    public void onDetach() {
+        super.onDetach();
+        consumer = null;
+        navigator = null;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -156,6 +153,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         super.onStop();
         if (consumer != null) {
             consumer.setPhotosList(dataList);
+            consumer.setBlackList(blackList);
         }
     }
 
@@ -164,6 +162,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.camera_local_menu, menu);
         Modifier.changeMenuItemColor(menu);
+        this.menu = menu;
     }
 
     @Override
@@ -174,6 +173,10 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
                 break;
             case R.id.camera_attach_dos:
                 pickPhoto();
+                break;
+            case R.id.delete_camera_local:
+                purgeList();
+                showCheckBox();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -262,9 +265,6 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
                         final InputStream imageStream = ((Activity) getContext()).getContentResolver().openInputStream(imageUri);
                         final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
 
-                        //selectedImage.setConfig(matrix);
-
-
                         final File imageFile = createImageFile();
 
                         new AsyncTask<Void, Void, Void>() {
@@ -290,7 +290,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
                         }.execute();
 
 
-                        FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+                        FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
                         foto.show(getFragmentManager(), "dialog");
                         ruta = imageFile.getPath();
                     } catch (FileNotFoundException e) {
@@ -307,7 +307,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     private void imageResult(int resultCode) {
         if (resultCode == ((Activity) getContext()).RESULT_OK) {
             control = true;
-            FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+            FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
             foto.show(getFragmentManager(), "dialog");
 
         } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
@@ -332,7 +332,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new FotosLocalAdapter(dataList, getActivity(), this);
+        mAdapter = new FotosLocalAdapter(dataList, getContext(), this, this);
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -348,8 +348,85 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         current.setTitulo(title);
         current.setDescripcion(descripcion);
         dataList.add(current);
-        //current = new Foto();
         mAdapter.notifyDataSetChanged();
     }
 
+    public void addElementToBlackList(int position) {
+        blackList.add(dataList.get(position));
+    }
+
+    public void removeFromBlackList(int position) {
+        blackList.remove(dataList.get(position));
+    }
+
+    @Override
+    public void showCheckBox() {
+        MenuItem attachment = menu.findItem(R.id.camera_attach_dos);
+        MenuItem takePhoto = menu.findItem(R.id.camera_foto_local);
+        MenuItem delete = menu.findItem(R.id.delete_camera_local);
+        if (showCheck) {
+            showCheck = false;
+            attachment.setVisible(true);
+            takePhoto.setVisible(true);
+            delete.setVisible(false);
+            consumer.setActionMode(false);
+        } else {
+            showCheck = true;
+            attachment.setVisible(false);
+            takePhoto.setVisible(false);
+            delete.setVisible(true);
+            consumer.setActionMode(true);
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean getBoolean() {
+        return showCheck;
+    }
+
+    @Override
+    public void showElementInfo(int layoutPosition) {
+        String title = dataList.get(layoutPosition).getTitulo();
+        String descripcion = dataList.get(layoutPosition).getDescripcion();
+        FotoDialogFragment foto = FotoDialogFragment.newInstance(title, descripcion, layoutPosition);
+        foto.show(getFragmentManager(), "dialog");
+    }
+
+    public void purgeList() {
+        for (FotoDB ft : blackList) {
+            dataList.remove(ft);
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void position(int position) {
+        ImageViewFragment dialog = ImageViewFragment.newInstance(dataList.get(position).getArchivo(), null);
+        dialog.show(getFragmentManager(), "imgDialog");
+    }
+
+    public void closeActionMode() {
+        showCheckBox();
+    }
+
+    public void editModel(String title, String descripcion, int posicion) {
+        FotoDB foto = dataList.get(posicion);
+        foto.setDescripcion(descripcion);
+        foto.setTitulo(title);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public interface PhotosConsumer {
+        public void setPhotosList(List<FotoDB> list);
+
+        public void setBlackList(List<FotoDB> blackList);
+
+        public List<FotoDB> getPhotosList();
+
+        public void setActionMode(boolean mode);
+
+        public boolean isActionMode();
+
+    }
 }

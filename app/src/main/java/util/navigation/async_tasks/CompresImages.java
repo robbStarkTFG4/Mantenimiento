@@ -22,14 +22,17 @@ import util.navigation.modelos.Foto;
 public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
 
 
+    private int codigo;
+
     public interface CompresConsumer {
-        public void compresResult(boolean res);
+        public void compresResult(boolean res, int codigo);
     }
 
     private CompresConsumer consumer;
 
-    public CompresImages(CompresConsumer consumer) {
+    public CompresImages(CompresConsumer consumer, int codigo) {
         this.consumer = consumer;
+        this.codigo = codigo;
     }
 
     @Override
@@ -38,23 +41,25 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
         for (Foto foto : params) {
 
             String ruta = foto.getArchivo();
-            Bitmap bit = BitmapFactory.decodeFile(ruta);
-            if (bit != null) {
-                try {
-                    File rep = new File(ruta);
-                    OutputStream stream = new FileOutputStream(rep);
-                    bit.compress(Bitmap.CompressFormat.JPEG, 60, stream);
-                    stream.flush();
-                    stream.close();
-                    Log.d("ASYNC_TASK", rep.getName());
-                    Response res = service.uploadImage2(new TypedString(rep.getName()), new TypedFile("image/jpeg", rep));
-                    if (res != null) {
-                        if (!(res.getStatus() == 204)) {
-                            return false;
+            if (getFileSizeInMB(foto.getArchivo()) > 1) {
+                Bitmap bit = BitmapFactory.decodeFile(ruta);
+                if (bit != null) {
+                    try {
+                        File rep = new File(ruta);
+                        OutputStream stream = new FileOutputStream(rep);
+                        bit.compress(Bitmap.CompressFormat.JPEG, 60, stream);
+                        stream.flush();
+                        stream.close();
+                        Log.d("ASYNC_TASK", rep.getName());
+                        Response res = service.uploadImage2(new TypedString(rep.getName()), new TypedFile("image/jpeg", rep));
+                        if (res != null) {
+                            if (!(res.getStatus() == 204)) {
+                                return false;
+                            }
                         }
+                    } catch (IOException e) {
+                        return false;
                     }
-                } catch (IOException e) {
-                    return false;
                 }
             }
         }
@@ -64,6 +69,32 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
-        consumer.compresResult(aBoolean);
+        if (consumer != null) {
+            consumer.compresResult(aBoolean, codigo);
+        }
+    }
+
+    public float getFileSizeInMB(String fileName) {
+        float ret = getFileSizeInBytes(fileName);
+        ret = ret / (float) (1024 * 1024);
+        return ret;
+    }
+
+    public long getFileSizeInBytes(String fileName) {
+        long ret = 0;
+        File f = new File(fileName);
+        if (f.isFile()) {
+            return f.length();
+        } else if (f.isDirectory()) {
+            File[] contents = f.listFiles();
+            for (int i = 0; i < contents.length; i++) {
+                if (contents[i].isFile()) {
+                    ret += contents[i].length();
+                } else if (contents[i].isDirectory()) {
+                    ret += getFileSizeInBytes(contents[i].getPath());
+                }
+            }
+        }
+        return ret;
     }
 }

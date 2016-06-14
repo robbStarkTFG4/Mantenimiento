@@ -176,19 +176,17 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
             case R.id.camera_foto:
                 try {
                     //Log.v("CAMERA", mCameraId + " " + mCameraDeviceStateCallback);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                        if(ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA)
-                                == PackageManager.PERMISSION_GRANTED){
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED) {
                             cameraIntent();
-                        }
-                        else {
-                            if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)){
-                                Toast.makeText(getContext(),"No Permission to use the Camera services", Toast.LENGTH_SHORT).show();
+                        } else {
+                            if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
+                                Toast.makeText(getContext(), "No Permission to use the Camera services", Toast.LENGTH_SHORT).show();
                             }
-                            requestPermissions(new String[] {android.Manifest.permission.CAMERA},REQUEST_CAMERA_RESULT);
+                            requestPermissions(new String[]{android.Manifest.permission.CAMERA}, REQUEST_CAMERA_RESULT);
                         }
-                    }
-                    else {
+                    } else {
                         cameraIntent();
                     }
                 } catch (Exception e) {
@@ -314,7 +312,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
                         }.execute();
 
 
-                        FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+                        FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
                         foto.show(getFragmentManager(), "dialog");
                         ruta = imageFile.getPath();
                     } catch (FileNotFoundException e) {
@@ -335,7 +333,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
     private void imageResult(int resultCode) {
         if (resultCode == ((Activity) getContext()).RESULT_OK) {
             control = true;
-            FotoDialogFragment foto = FotoDialogFragment.newInstance("das", "das");
+            FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
             foto.show(getFragmentManager(), "dialog");
 
         } else if (resultCode == ((Activity) getContext()).RESULT_CANCELED) {
@@ -373,7 +371,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         current.setDescripcion(descripcion);
         dataList.add(current);
         //if (control) {
-            mAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
         //}
     }
 
