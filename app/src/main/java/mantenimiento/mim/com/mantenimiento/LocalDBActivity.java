@@ -41,11 +41,13 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import server.OrdenAPI;
 import server.PhotoReportAPI;
+import util.navigation.CompresConsumer;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.PortableDialogItem;
 import util.navigation.SerialListHolder;
 import util.navigation.async_tasks.CompresImages;
+import util.navigation.async_tasks.CompresImagesLocal;
 import util.navigation.async_tasks.ReportBuilder;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
@@ -55,7 +57,7 @@ import util.navigation.modelos.Orden;
 public class LocalDBActivity extends AppCompatActivity implements Navigator, OnclickLink
         , OrdenInfoFragment.OrdenConsumer, ServicioLocalFragment.HistoryConsumerLocal
         , CameraLocalFragment.PhotosConsumer, ValueDialogPortableFragment.PortableDialogConsumer
-        , PortableDialogItem, FotoDialogFragment.DialogConsumer, CompresImages.CompresConsumer
+        , PortableDialogItem, FotoDialogFragment.DialogConsumer, CompresConsumer
         , TrabajoLocalFragment.PhotographicLocalConsumer {
 
     private Boolean action_mode = false;
@@ -326,6 +328,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             }
         } else {
             if (res) {
+                pg.dismiss();
                 reportGen();
             } else {
                 Toast.makeText(this, "hubo algun error", Toast.LENGTH_SHORT).show();
@@ -502,13 +505,17 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         if (fotoList != null) {
             Log.d("point", "list is not null....");
             if (fotoList.size() > 0) {
+                pg = new ProgressDialog(this);
+                pg.setMessage("comprimiendo imagenes....");
+                pg.setCanceledOnTouchOutside(false);
+                pg.show();
                 Log.d("point", "launch task....");
                 List<Foto> list = new ArrayList<>();
                 for (int i = 0; i < fotoList.size(); i++) {
                     FotoDB temp = fotoList.get(i);
                     list.add(new Foto(temp.getArchivo(), temp.getTitulo(), temp.getDescripcion()));
                 }
-                CompresImages task = new CompresImages(this, 2);
+                CompresImagesLocal task = new CompresImagesLocal(this, 2);
                 Foto[] array = new Foto[list.size()];
                 for (int i = 0; i < list.size(); i++) {
                     array[i] = list.get(i);

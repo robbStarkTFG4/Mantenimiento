@@ -285,14 +285,24 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
                             @Override
                             protected void onPostExecute(Void aVoid) {
                                 super.onPostExecute(aVoid);
-                                notifyChange();
+                                new AsyncTask<Void, Void, Void>() {
+
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        File del = new File(imageUri.getPath());
+                                        del.delete();
+                                        return null;
+                                    }
+                                }.execute();
+
+                                FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
+                                foto.show(getFragmentManager(), "dialog");
+                                ruta = imageFile.getAbsolutePath();
+
                             }
                         }.execute();
 
 
-                        FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
-                        foto.show(getFragmentManager(), "dialog");
-                        ruta = imageFile.getPath();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {

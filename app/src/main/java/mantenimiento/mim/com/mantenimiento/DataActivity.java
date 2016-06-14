@@ -38,6 +38,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import server.OrdenAPI;
+import util.navigation.CompresConsumer;
 import util.navigation.Navigator;
 import util.navigation.PortableDialogItem;
 import util.navigation.SerialListHolder;
@@ -51,7 +52,7 @@ import util.navigation.modelos.Orden;
 
 public class DataActivity extends AppCompatActivity implements Navigator, FotoDialogFragment.DialogConsumer
         , CameraFragment.PhotosConsumer, BarcodeReaderFragment.EquipmentConsumer
-        , OrdenFragment.OrdenConsumer, ServicioFragment.HistoryConsumer, CompresImages.CompresConsumer
+        , OrdenFragment.OrdenConsumer, ServicioFragment.HistoryConsumer, CompresConsumer
         , PortableDialogItem, ValueDialogPortableFragment.PortableDialogConsumer {
 
     private FragmentManager manager;

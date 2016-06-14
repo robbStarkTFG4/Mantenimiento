@@ -42,6 +42,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import server.OrdenAPI;
 import server.PhotoReportAPI;
+import util.navigation.CompresConsumer;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.async_tasks.CompresImages;
@@ -53,7 +54,7 @@ import util.navigation.modelos.Lugar;
 import util.navigation.modelos.Orden;
 
 public class FotoGraphActivity extends AppCompatActivity implements Navigator, ChooseLineFragment.LineConsumer
-        , OnclickLink, CameraFragment.PhotosConsumer, FotoDialogFragment.DialogConsumer, TrabajoFragment.PhotographicConsumer, CompresImages.CompresConsumer {
+        , OnclickLink, CameraFragment.PhotosConsumer, FotoDialogFragment.DialogConsumer, TrabajoFragment.PhotographicConsumer,CompresConsumer {
 
     private String lugar;
     private List<Foto> photoList;
