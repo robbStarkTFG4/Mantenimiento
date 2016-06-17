@@ -71,6 +71,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     public DaoSession session;
     private int currentPortablePos;
     private String codigo = "";
+    private int idCurrentOrden;
     //End database objects
 
 
@@ -334,7 +335,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         });
     }
 
-    private void upLoadPicturesObjects(int idorden, final ProgressDialog pg) {
+    private void upLoadPicturesObjects(final int idorden, final ProgressDialog pg) {
         if (list != null) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
             service.persistPhotoObjects(idorden, list, new Callback<Foto>() {
@@ -342,7 +343,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 public void success(Foto foto, Response response) {
                     pg.setMessage("subiendo imagenes.....");
                     DataActivity.this.pg = pg;
-                    fileUpload();
+                    fileUpload(idorden);
                 }
 
                 @Override
@@ -351,14 +352,27 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 }
             });
         } else {
-            pg.dismiss();
-            Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-            closeService();
+
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.markOrder(idCurrentOrden, new Callback<Orden>() {
+                @Override
+                public void success(Orden orden, Response response) {
+                    pg.dismiss();
+                    Toast.makeText(DataActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    closeService();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
     }
 
-    private void fileUpload() {
+    private void fileUpload(int idOrden) {
+        this.idCurrentOrden = idOrden;
         if (list != null) {
             if (list.size() > 0) {
                 CompresImages task = new CompresImages(this, 0);
@@ -374,10 +388,21 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     @Override
     public void compresResult(boolean res, int codigo) {
         if (res) {
-            pg.dismiss();
-            Toast.makeText(this, "Reporte procesado", Toast.LENGTH_SHORT).show();
-            Log.d("RESULTADO_COMPRESION: ", "funciono");
-            closeService();
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.markOrder(idCurrentOrden, new Callback<Orden>() {
+                @Override
+                public void success(Orden orden, Response response) {
+                    pg.dismiss();
+                    Toast.makeText(DataActivity.this, "Reporte procesado", Toast.LENGTH_SHORT).show();
+                    Log.d("RESULTADO_COMPRESION: ", "funciono");
+                    closeService();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             Toast.makeText(this, "Fallo en compresion", Toast.LENGTH_SHORT).show();
             Log.d("RESULTADO_COMPRESION: ", "fallo");

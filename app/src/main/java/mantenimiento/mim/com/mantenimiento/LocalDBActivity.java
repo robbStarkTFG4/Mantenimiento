@@ -75,6 +75,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     private ProgressDialog pg;
     private List<Foto> list;
     private List<FotoDB> blackList;
+    private int idOrden;
     //End database objects
 
     /**
@@ -222,7 +223,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
 
     @Override//convertir :  1 - orden
     public void upload() {
-        Log.d("CODIGO_BARRAS", current.getEquipoDB().getCodigoBarras());
+
         Orden orden = new Orden(current);
         final ProgressDialog pg = new ProgressDialog(this);
         pg.setMessage("espera un momento...");
@@ -271,7 +272,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         });
     }
 
-    private void upLoadPicturesObjects(int idorden, final ProgressDialog pg) {
+    private void upLoadPicturesObjects(final int idorden, final ProgressDialog pg) {
         list = new ArrayList<>();
         for (int i = 0; i < fotoList.size(); i++) {
             FotoDB temp = fotoList.get(i);
@@ -284,7 +285,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 public void success(Foto foto, Response response) {
                     pg.setMessage("subiendo imagenes.....");
                     LocalDBActivity.this.pg = pg;
-                    fileUpload();
+                    fileUpload(idorden);
                 }
 
                 @Override
@@ -294,16 +295,28 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             });
         } else {
             //current.
-            current.setMostrar(true);
-            session.getOrdenDBDao().update(current);
-            pg.dismiss();
-            Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-            closeService();
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.markOrder(idOrden, new Callback<Orden>() {
+                @Override
+                public void success(Orden orden, Response response) {
+                    current.setMostrar(true);
+                    session.getOrdenDBDao().update(current);
+                    pg.dismiss();
+                    Toast.makeText(LocalDBActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    closeService();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
     }
 
-    private void fileUpload() {
+    private void fileUpload(int idOrden) {
+        this.idOrden = idOrden;
         if (list != null) {
             if (list.size() > 0) {
                 CompresImages task = new CompresImages(this, 0);
@@ -321,12 +334,23 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         Log.d("comprees", "result: " + res + "  codigo: " + codigo);
         if (codigo == 0) {
             if (res) {
-                current.setMostrar(true);
-                session.getOrdenDBDao().update(current);
-                pg.dismiss();
-                Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-                Log.d("RESULTADO_COMPRESION: ", "funciono");
-                closeService();
+                OrdenAPI service = OrdenAPI.Factory.getInstance();
+                service.markOrder(idOrden, new Callback<Orden>() {
+                    @Override
+                    public void success(Orden orden, Response response) {
+                        current.setMostrar(true);
+                        session.getOrdenDBDao().update(current);
+                        pg.dismiss();
+                        Toast.makeText(LocalDBActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                        Log.d("RESULTADO_COMPRESION: ", "funciono");
+                        closeService();
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    }
+                });
             } else {
                 Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
                 Log.d("RESULTADO_COMPRESION: ", "fallo");

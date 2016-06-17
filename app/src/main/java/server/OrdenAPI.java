@@ -9,6 +9,7 @@ import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.mime.TypedFile;
@@ -62,6 +63,9 @@ public interface OrdenAPI {
 
     @POST("/com.mim.entities.orden/sube")
     public void persistOrder(@Body Orden orden, Callback<Orden> cb);
+
+    @GET("/com.mim.entities.orden/mark/{numero}")
+    public void markOrder(@Path("numero") int id, Callback<Orden> cb);
 
     @POST("/com.mim.entities.historialdetalles/lista/{orden}")
     public void persistHistoryList(@Path("orden") int orden, @Body List<HistorialDetalles> historyList, Callback<HistorialDetalles> cb);

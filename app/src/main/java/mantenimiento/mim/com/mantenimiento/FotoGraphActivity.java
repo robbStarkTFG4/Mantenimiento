@@ -54,7 +54,7 @@ import util.navigation.modelos.Lugar;
 import util.navigation.modelos.Orden;
 
 public class FotoGraphActivity extends AppCompatActivity implements Navigator, ChooseLineFragment.LineConsumer
-        , OnclickLink, CameraFragment.PhotosConsumer, FotoDialogFragment.DialogConsumer, TrabajoFragment.PhotographicConsumer,CompresConsumer {
+        , OnclickLink, CameraFragment.PhotosConsumer, FotoDialogFragment.DialogConsumer, TrabajoFragment.PhotographicConsumer, CompresConsumer {
 
     private String lugar;
     private List<Foto> photoList;
@@ -65,6 +65,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     private DaoMaster master;
     public DaoSession session;
     private ProgressDialog pg;
+    private int idOrden;
     //End database objects
 
     @Override
@@ -266,7 +267,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
         }.execute();
     }
 
-    private void uploadPictures(Integer idorden, final ProgressDialog pg) {
+    private void uploadPictures(final Integer idorden, final ProgressDialog pg) {
         if (photoList != null) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
             service.persistPhotoObjects(idorden, photoList, new Callback<Foto>() {
@@ -274,7 +275,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
                 public void success(Foto foto, Response response) {
                     pg.setMessage("subiendo imagenes.....");
 
-                    fileUpload();
+                    fileUpload(idorden);
                 }
 
                 @Override
@@ -283,13 +284,28 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
                 }
             });
         } else {
-            pg.dismiss();
-            Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-            closeService();
+
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.markOrder(idOrden, new Callback<Orden>() {
+                @Override
+                public void success(Orden orden, Response response) {
+                    pg.dismiss();
+                    Toast.makeText(FotoGraphActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    closeService();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    pg.dismiss();
+                    Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
-    private void fileUpload() {
+    private void fileUpload(int idOrden) {
+        this.idOrden = idOrden;
+
         if (photoList != null) {
             if (photoList.size() > 0) {
                 CompresImages task = new CompresImages(this, 0);
@@ -305,10 +321,23 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     @Override
     public void compresResult(boolean res, int codigo) {
         if (res) {
-            pg.dismiss();
-            Toast.makeText(this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-            Log.d("RESULTADO_COMPRESION: ", "funciono");
-            closeService();
+
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.markOrder(idOrden, new Callback<Orden>() {
+                @Override
+                public void success(Orden orden, Response response) {
+                    pg.dismiss();
+                    Toast.makeText(FotoGraphActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    Log.d("RESULTADO_COMPRESION: ", "funciono");
+                    closeService();
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    pg.dismiss();
+                    Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
             Log.d("RESULTADO_COMPRESION: ", "fallo");
