@@ -25,7 +25,8 @@ import util.navigation.modelos.Orden;
  * Created by marcoisaac on 5/19/2016.
  */
 public interface PhotoReportAPI {
-    public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources";
+    //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources";
+    public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources";
 
     public class Factory {
         private static PhotoReportAPI service;
