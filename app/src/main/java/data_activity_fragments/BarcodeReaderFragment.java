@@ -21,9 +21,9 @@ import com.google.zxing.integration.android.IntentResult;
 import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.OrdenAPI;
 import util.navigation.Navigator;
 import util.navigation.modelos.Equipo;
@@ -178,65 +178,81 @@ public class BarcodeReaderFragment extends Fragment {
         dialog.setMessage("Espera un momento");
         dialog.show();
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.getEquipmentByCodeBar(res, new Callback<Equipo>() {
-
-
+        service.getEquipmentByCodeBar(res).enqueue(new Callback<Equipo>() {
             @Override
-            public void success(Equipo equipo, Response response) {
+            public void onResponse(Call<Equipo> call, Response<Equipo> response) {
                 if (consumer != null) {
-                    consumer.consumeEquipment(equipo);
-                    BarcodeReaderFragment.this.idTipo = equipo.getListaNombreEquiposIdlistaNombre();
-                    //Toast.makeText(getContext(), "numero: " + BarcodeReaderFragment.this.idTipo, Toast.LENGTH_SHORT).show();
-                    getFactoryList(dialog, equipo.getIdequipo());
+                    if (response.body() != null) {
+                        consumer.consumeEquipment(response.body());
+                        BarcodeReaderFragment.this.idTipo = response.body().getListaNombreEquiposIdlistaNombre();
+                        //Toast.makeText(getContext(), "numero: " + BarcodeReaderFragment.this.idTipo, Toast.LENGTH_SHORT).show();
+                        getFactoryList(dialog, response.body().getIdequipo());
+                    } else {
+                        if (getContext() != null) {
+                            Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<Equipo> call, Throwable throwable) {
                 if (consumer != null) {
                     dialog.dismiss();
                     Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
                 }
             }
         });
+
     }
 
     private void getFactoryList(final ProgressDialog dialog, final Integer idequipo) {
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.getFactoryList(idequipo, new Callback<List<InformacionFabricante>>() {
+        service.getFactoryList(idequipo).enqueue(new Callback<List<InformacionFabricante>>() {
             @Override
-            public void success(List<InformacionFabricante> informacionFabricantes, Response response) {
-                //dialog.dismiss();
+            public void onResponse(Call<List<InformacionFabricante>> call, Response<List<InformacionFabricante>> response) {
                 if (consumer != null) {
-                    getHistorialDetalles(dialog, idequipo);
-                    consumer.consumeFactoryList(informacionFabricantes);
+                    if (response.body() != null) {
+                        getHistorialDetalles(dialog, idequipo);
+                        consumer.consumeFactoryList(response.body());
+                    } else {
+                        if(getContext()!=null) {
+                            Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
-                //Toast.makeText(getContext(), "exito " + informacionFabricantes.get(0).getParametro(), Toast.LENGTH_LONG).show();
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<List<InformacionFabricante>> call, Throwable throwable) {
                 if (consumer != null) {
                     dialog.dismiss();
                     Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
                 }
             }
         });
+
     }
 
     private void getHistorialDetalles(final ProgressDialog dialog, final Integer idequipo) {
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.getHistorialDetalles(idequipo, new Callback<List<HistorialDetalles>>() {
+        service.getHistorialDetalles(idequipo).enqueue(new Callback<List<HistorialDetalles>>() {
             @Override
-            public void success(List<HistorialDetalles> historialDetalles, Response response) {
+            public void onResponse(Call<List<HistorialDetalles>> call, Response<List<HistorialDetalles>> response) {
                 if (consumer != null) {
-                    consumer.consumeHistoryList(historialDetalles);
-                    retrieveNombre(dialog, idTipo);
+                    if (response.body() != null) {
+                        consumer.consumeHistoryList(response.body());
+                        retrieveNombre(dialog, idTipo);
+                    } else {
+                        if(getContext()!=null) {
+                            Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<List<HistorialDetalles>> call, Throwable throwable) {
                 if (consumer != null) {
                     dialog.dismiss();
                     Toast.makeText(getContext(), "hubo algun error ", Toast.LENGTH_LONG).show();
@@ -247,18 +263,24 @@ public class BarcodeReaderFragment extends Fragment {
 
     private void retrieveNombre(final ProgressDialog dialog, Integer idTipo) {
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.getNombreEquipo(idTipo, new Callback<ListaNombreEquipos>() {
+        service.getNombreEquipo(idTipo).enqueue(new Callback<ListaNombreEquipos>() {
             @Override
-            public void success(ListaNombreEquipos s, Response response) {
+            public void onResponse(Call<ListaNombreEquipos> call, Response<ListaNombreEquipos> response) {
                 if (consumer != null) {
                     dialog.dismiss();
-                    consumer.consumeNombreEquipo(s.getNombre());
-                    navigator.navigate("equipo");
+                    if (response.body() != null) {
+                        consumer.consumeNombreEquipo(response.body().getNombre());
+                        navigator.navigate("equipo");
+                    } else {
+                        if(getContext()!=null) {
+                            Toast.makeText(getContext(), "hubo algun error  ", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<ListaNombreEquipos> call, Throwable throwable) {
                 if (consumer != null) {
                     dialog.dismiss();
                     Toast.makeText(getContext(), "hubo algun error nombre tipo ", Toast.LENGTH_LONG).show();

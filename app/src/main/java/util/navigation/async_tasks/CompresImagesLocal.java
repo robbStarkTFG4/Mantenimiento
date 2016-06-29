@@ -10,9 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedFile;
-import retrofit.mime.TypedString;
+
 import server.OrdenAPI;
 import util.navigation.CompresConsumer;
 import util.navigation.modelos.Foto;

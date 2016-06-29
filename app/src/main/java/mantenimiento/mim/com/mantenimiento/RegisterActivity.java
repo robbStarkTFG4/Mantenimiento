@@ -15,9 +15,9 @@ import register_activity_fragments.InfoFragment;
 import register_activity_fragments.ProduceCodeFragment;
 import register_activity_fragments.TypeFragment;
 import register_activity_fragments.ValueDialogFragment;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.RegisterAPI;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
@@ -79,19 +79,28 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
         prog.setCanceledOnTouchOutside(false);
         prog.show();
         RegisterAPI service = RegisterAPI.Factory.getInstance();
-        service.registerFactoryParams(this.nombreEquipo.getIdlistaNombre(), new Callback<List<InformacionFabricante>>() {
+        service.registerFactoryParams(this.nombreEquipo.getIdlistaNombre()).enqueue(new Callback<List<InformacionFabricante>>() {
             @Override
-            public void success(List<InformacionFabricante> informacionFabricantes, Response response) {
-                prog.dismiss();
-                holder = new SerialListHolder();
-                holder.setInformacionFabricantes(informacionFabricantes);
-                navigateToInf(RegisterActivity.this.getSupportFragmentManager());
-                //Toast.makeText(RegisterActivity.this, informacionFabricantes.get(0).getParametro(), Toast.LENGTH_LONG).show();
+            public void onResponse(Call<List<InformacionFabricante>> call, Response<List<InformacionFabricante>> response) {
+               if(RegisterActivity.this!=null) {
+                   prog.dismiss();
+                   if (response.body() != null) {
+                       holder = new SerialListHolder();
+                       holder.setInformacionFabricantes(response.body());
+                       navigateToInf(RegisterActivity.this.getSupportFragmentManager());
+                   } else {
+                       if (RegisterActivity.this != null) {
+                           Toast.makeText(RegisterActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                       }
+                   }
+               }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                Toast.makeText(RegisterActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<List<InformacionFabricante>> call, Throwable throwable) {
+                if (RegisterActivity.this != null) {
+                    Toast.makeText(RegisterActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -160,35 +169,45 @@ public class RegisterActivity extends AppCompatActivity implements Navigator, Va
         pg.show();
 
         RegisterAPI service = RegisterAPI.Factory.getInstance();
-        service.registerEquipment(lineName, equipo, new Callback<Equipo>() {
+        service.registerEquipment(lineName,equipo).enqueue(new Callback<Equipo>() {
             @Override
-            public void success(Equipo equipo, Response response) {
-                //Toast.makeText(RegisterActivity.this, "registrado exitosamente: " + equipo.getIdequipo(), Toast.LENGTH_LONG).show();
-                registratInfoFabricante(equipo.getIdequipo(), infoList, pg);
+            public void onResponse(Call<Equipo> call, Response<Equipo> response) {
+                if(response.body()!=null) {
+                    registratInfoFabricante(response.body().getIdequipo(), infoList, pg);
+                }else{
+                    if(RegisterActivity.this!=null) {
+                        pg.dismiss();
+                        Toast.makeText(RegisterActivity.this, "falla al registrar", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(RegisterActivity.this, "falla al registrar", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<Equipo> call, Throwable throwable) {
+                if(RegisterActivity.this!=null) {
+                    pg.dismiss();
+                    Toast.makeText(RegisterActivity.this, "falla al registrar", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
 
     private void registratInfoFabricante(Integer idequipo, final List<InformacionFabricante> infoList, final ProgressDialog pg) {
         RegisterAPI service = RegisterAPI.Factory.getInstance();
-        service.registerFactoryParams(idequipo, infoList, new Callback<InformacionFabricante>() {
+        service.registerFactoryParams(idequipo,infoList).enqueue(new Callback<InformacionFabricante>() {
             @Override
-            public void success(InformacionFabricante o, Response response) {
+            public void onResponse(Call<InformacionFabricante> call, Response<InformacionFabricante> response) {
                 pg.dismiss();
                 Toast.makeText(RegisterActivity.this, "registrado exitosamente: ", Toast.LENGTH_LONG).show();
                 closeService();
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(RegisterActivity.this, "falla al registrar inf", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<InformacionFabricante> call, Throwable throwable) {
+                if(RegisterActivity.this!=null) {
+                    pg.dismiss();
+                    Toast.makeText(RegisterActivity.this, "falla al registrar inf", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

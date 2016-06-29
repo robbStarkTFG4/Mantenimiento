@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.RegisterAPI;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
@@ -119,26 +119,34 @@ public class TypeFragment extends Fragment implements OnclickLink {
         };
         thread.start();*/
         RegisterAPI service = RegisterAPI.Factory.getInstance();
-        service.getListNombreEquipos(new Callback<List<ListaNombreEquipos>>() {
+        service.getListNombreEquipos().enqueue(new Callback<List<ListaNombreEquipos>>() {
             @Override
-            public void success(List<ListaNombreEquipos> listaNombreEquiposes, Response response) {
-                if (list.size() > 0) {
-                    list.clear();
-                }
-
-                for(int i=0;i<listaNombreEquiposes.size();i++){
-                    list.add(listaNombreEquiposes.get(i));
-                }
-                mAdapter.notifyDataSetChanged();
+            public void onResponse(Call<List<ListaNombreEquipos>> call, Response<List<ListaNombreEquipos>> response) {
                 dialog.dismiss();
+                if (response.body() != null) {
+                    if (list.size() > 0) {
+                        list.clear();
+                    }
+
+                    for (int i = 0; i < response.body().size(); i++) {
+                        list.add(response.body().get(i));
+                    }
+                    mAdapter.notifyDataSetChanged();
+
+                } else {
+                    if (getContext() != null) {
+                        Toast.makeText(getContext(), "hubo algun error", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-               Toast.makeText(getContext(),"hubo algun error",Toast.LENGTH_LONG).show();
+            public void onFailure(Call<List<ListaNombreEquipos>> call, Throwable throwable) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "hubo algun error", Toast.LENGTH_LONG).show();
+                }
             }
         });
-
     }
 
     private void dataSetUp() {

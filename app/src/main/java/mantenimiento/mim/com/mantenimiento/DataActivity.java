@@ -34,9 +34,9 @@ import local_Db.LugarDBDao;
 import local_Db.OrdenDB;
 import local_Db.OrdenDBDao;
 import local_db_activity_fragments.ValueDialogPortableFragment;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.OrdenAPI;
 import util.navigation.CompresConsumer;
 import util.navigation.Navigator;
@@ -214,17 +214,25 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         pg.setCanceledOnTouchOutside(false);
         pg.show();
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.persistOrder(orden, new Callback<Orden>() {
+        service.persistOrder(orden).enqueue(new Callback<Orden>() {
             @Override
-            public void success(Orden orden, Response response) {
-                //pg.setMessage(String.valueOf(orden.getIdorden()));//aqui esta el id de la orden
-                upLoadHistoryDetails(orden.getIdorden(), pg);
+            public void onResponse(Call<Orden> call, Response<Orden> response) {
+                if(response.body()!=null) {
+                    upLoadHistoryDetails(response.body().getIdorden(), pg);
+                }else{
+                    if (DataActivity.this != null) {
+                        pg.dismiss();
+                        Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<Orden> call, Throwable throwable) {
+                if (DataActivity.this != null) {
+                    pg.dismiss();
+                    Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -321,50 +329,57 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     private void upLoadHistoryDetails(final int idorden, final ProgressDialog pg) {
         Log.d("ID_ORDEN", String.valueOf(idorden));
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.persistHistoryList(idorden, historyList, new Callback<HistorialDetalles>() {
+        service.persistHistoryList(idorden, historyList).enqueue(new Callback<HistorialDetalles>() {
             @Override
-            public void success(HistorialDetalles o, Response response) {
+            public void onResponse(Call<HistorialDetalles> call, Response<HistorialDetalles> response) {
                 upLoadPicturesObjects(idorden, pg);
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(DataActivity.this, "hubo algun error history", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<HistorialDetalles> call, Throwable throwable) {
+                if (DataActivity.this != null) {
+                    pg.dismiss();
+                    Toast.makeText(DataActivity.this, "hubo algun error history", Toast.LENGTH_LONG).show();
+                }
             }
         });
+
     }
 
     private void upLoadPicturesObjects(final int idorden, final ProgressDialog pg) {
         if (list != null) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.persistPhotoObjects(idorden, list, new Callback<Foto>() {
+            service.persistPhotoObjects(idorden, list).enqueue(new Callback<Foto>() {
                 @Override
-                public void success(Foto foto, Response response) {
+                public void onResponse(Call<Foto> call, Response<Foto> response) {
                     pg.setMessage("subiendo imagenes.....");
                     DataActivity.this.pg = pg;
                     fileUpload(idorden);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(DataActivity.this, "hubo algun error fotos", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Foto> call, Throwable throwable) {
+                    if (DataActivity.this != null) {
+                        Toast.makeText(DataActivity.this, "hubo algun error fotos", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } else {
 
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.markOrder(idCurrentOrden, new Callback<Orden>() {
+            service.markOrder(idCurrentOrden).enqueue(new Callback<Orden>() {
                 @Override
-                public void success(Orden orden, Response response) {
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
                     pg.dismiss();
                     Toast.makeText(DataActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
                     closeService();
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if (DataActivity.this != null) {
+                        Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -389,9 +404,9 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     public void compresResult(boolean res, int codigo) {
         if (res) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.markOrder(idCurrentOrden, new Callback<Orden>() {
+            service.markOrder(idCurrentOrden).enqueue(new Callback<Orden>() {
                 @Override
-                public void success(Orden orden, Response response) {
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
                     pg.dismiss();
                     Toast.makeText(DataActivity.this, "Reporte procesado", Toast.LENGTH_SHORT).show();
                     Log.d("RESULTADO_COMPRESION: ", "funciono");
@@ -399,8 +414,10 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if (DataActivity.this != null) {
+                        Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } else {

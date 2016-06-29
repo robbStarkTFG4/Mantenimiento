@@ -10,9 +10,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import retrofit.client.Response;
-import retrofit.mime.TypedFile;
-import retrofit.mime.TypedString;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 import server.OrdenAPI;
 import util.navigation.CompresConsumer;
 import util.navigation.modelos.Foto;
@@ -50,9 +54,17 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
                         stream.flush();
                         stream.close();
                         Log.d("ASYNC_TASK", rep.getName());
-                        Response res = service.uploadImage2(new TypedString(rep.getName()), new TypedFile("image/jpeg", rep));
-                        if (res != null) {
-                            if (!(res.getStatus() == 204)) {
+
+                        RequestBody requestFile =
+                                RequestBody.create(MediaType.parse("image/jpeg"), rep);
+
+
+
+                        Call<ResponseBody> res = service.uploadImage2(rep.getName(), requestFile);
+                        Response<ResponseBody> response = res.execute();
+
+                        if (response != null) {
+                            if (!(response.isSuccessful())) {
                                 return false;
                             }
                         }
@@ -61,9 +73,21 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
                     }
                 }
             } else {
-                Response res = service.uploadImage2(new TypedString(rep.getName()), new TypedFile("image/jpeg", rep));
-                if (res != null) {
-                    if (!(res.getStatus() == 204)) {
+                RequestBody requestFile =
+                        RequestBody.create(MediaType.parse("image/jpeg"), rep);
+
+
+
+                Call<ResponseBody> res = service.uploadImage2(rep.getName(), requestFile);
+                Response<ResponseBody> response = null;
+                try {
+                    response = res.execute();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if (response != null) {
+                    if (!(response.isSuccessful())) {
                         return false;
                     }
                 }

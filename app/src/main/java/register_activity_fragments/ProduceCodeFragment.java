@@ -21,9 +21,9 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import mantenimiento.mim.com.mantenimiento.R;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.RegisterAPI;
 import util.navigation.Navigator;
 
@@ -163,22 +163,32 @@ public class ProduceCodeFragment extends Fragment {
         dialog2.setMessage("validando codigo....");
         dialog2.show();
         RegisterAPI service = RegisterAPI.Factory.getInstance();
-        service.validateCode(code, new Callback<String>() {
+        service.validateCode(code).enqueue(new Callback<String>() {
             @Override
-            public void success(String s, Response response) {
+            public void onResponse(Call<String> call, Response<String> response) {
                 if (consumer != null) {
                     dialog2.dismiss();
-                    if (s.equals("valido")) {
-                        consumer.barCodeResult(caja.getText().toString());
-                        ProduceCodeFragment.this.navigator.navigate("lugar");
+                    if (response.body() != null) {
+                        if (response.body().equals("valido")) {
+                            consumer.barCodeResult(caja.getText().toString());
+                            ProduceCodeFragment.this.navigator.navigate("lugar");
+                        } else {
+                            if (consumer != null) {
+                                Toast.makeText(ProduceCodeFragment.this.getContext(), "codigo invalido", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
                     } else {
-                        Toast.makeText(ProduceCodeFragment.this.getContext(), "codigo invalido", Toast.LENGTH_SHORT).show();
+                        if (consumer != null) {
+                            dialog2.dismiss();
+                            Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<String> call, Throwable throwable) {
                 if (consumer != null) {
                     dialog2.dismiss();
                     Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
@@ -189,18 +199,25 @@ public class ProduceCodeFragment extends Fragment {
 
     private void generateCodeFromDB() {
         RegisterAPI service = RegisterAPI.Factory.getInstance();
-        service.getBarCode(new Callback<String>() {
+        service.getBarCode().enqueue(new Callback<String>() {
             @Override
-            public void success(String s, Response response) {
+            public void onResponse(Call<String> call, Response<String> response) {
                 if (consumer != null) {
-                    caja.setText(s);
-                    consumer.barCodeResult(s);
-                    dialog.dismiss();
+                    if(response.body()!=null) {
+                        caja.setText(response.body());
+                        consumer.barCodeResult(response.body());
+                        dialog.dismiss();
+                    }else{
+                        if (consumer != null) {
+                            dialog.dismiss();
+                            Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<String> call, Throwable throwable) {
                 if (consumer != null) {
                     dialog.dismiss();
                     Toast.makeText(ProduceCodeFragment.this.getContext(), "hubo un error", Toast.LENGTH_SHORT).show();

@@ -36,9 +36,9 @@ import local_db_activity_fragments.OrdenInfoFragment;
 import local_db_activity_fragments.ServicioLocalFragment;
 import local_db_activity_fragments.TrabajoLocalFragment;
 import local_db_activity_fragments.ValueDialogPortableFragment;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.OrdenAPI;
 import server.PhotoReportAPI;
 import util.navigation.CompresConsumer;
@@ -230,17 +230,25 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         pg.setCanceledOnTouchOutside(false);
         pg.show();
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.persistOrder(orden, new Callback<Orden>() {
+        service.persistOrder(orden).enqueue(new Callback<Orden>() {
             @Override
-            public void success(Orden orden, Response response) {
-                //pg.setMessage(String.valueOf(orden.getIdorden()));//aqui esta el id de la orden
-                upLoadHistoryDetails(orden.getIdorden(), pg);
+            public void onResponse(Call<Orden> call, Response<Orden> response) {
+                if(response.body()!=null) {
+                    upLoadHistoryDetails(response.body().getIdorden(), pg);
+                }else{
+                    if (LocalDBActivity.this != null) {
+                        pg.dismiss();
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<Orden> call, Throwable throwable) {
+                if (LocalDBActivity.this != null) {
+                    pg.dismiss();
+                    Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -258,16 +266,18 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             detalles.add(new HistorialDetalles(his.getParametro(), his.getValor()));
         }
         OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.persistHistoryList(idorden, detalles, new Callback<HistorialDetalles>() {
+        service.persistHistoryList(idorden, detalles).enqueue(new Callback<HistorialDetalles>() {
             @Override
-            public void success(HistorialDetalles o, Response response) {
+            public void onResponse(Call<HistorialDetalles> call, Response<HistorialDetalles> response) {
                 upLoadPicturesObjects(idorden, pg);
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(LocalDBActivity.this, "hubo algun error 2", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<HistorialDetalles> call, Throwable throwable) {
+                if (LocalDBActivity.this != null) {
+                    pg.dismiss();
+                    Toast.makeText(LocalDBActivity.this, "hubo algun error 2", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -280,25 +290,28 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         }
         if (list.size() > 0) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.persistPhotoObjects(idorden, list, new Callback<Foto>() {
+            service.persistPhotoObjects(idorden, list).enqueue(new Callback<Foto>() {
                 @Override
-                public void success(Foto foto, Response response) {
+                public void onResponse(Call<Foto> call, Response<Foto> response) {
                     pg.setMessage("subiendo imagenes.....");
                     LocalDBActivity.this.pg = pg;
                     fileUpload(idorden);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(LocalDBActivity.this, "hubo algun error 3", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Foto> call, Throwable throwable) {
+                    if (LocalDBActivity.this != null) {
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error 3", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
+
         } else {
             //current.
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.markOrder(idOrden, new Callback<Orden>() {
+            service.markOrder(idorden).enqueue(new Callback<Orden>() {
                 @Override
-                public void success(Orden orden, Response response) {
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
                     current.setMostrar(true);
                     session.getOrdenDBDao().update(current);
                     pg.dismiss();
@@ -307,8 +320,10 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if (LocalDBActivity.this != null) {
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -335,9 +350,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         if (codigo == 0) {
             if (res) {
                 OrdenAPI service = OrdenAPI.Factory.getInstance();
-                service.markOrder(idOrden, new Callback<Orden>() {
+                service.markOrder(idOrden).enqueue(new Callback<Orden>() {
                     @Override
-                    public void success(Orden orden, Response response) {
+                    public void onResponse(Call<Orden> call, Response<Orden> response) {
                         current.setMostrar(true);
                         session.getOrdenDBDao().update(current);
                         pg.dismiss();
@@ -347,8 +362,10 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
-                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    public void onFailure(Call<Orden> call, Throwable throwable) {
+                        if (LocalDBActivity.this != null) {
+                            Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             } else {
@@ -492,17 +509,24 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         pg.show();
 
         PhotoReportAPI service = PhotoReportAPI.Factory.getInstance();
-        service.persistOrder(orden.getEquipoDB().getLugarDB().getNombre(), res, new Callback<Orden>() {
+        service.persistOrder(orden.getEquipoDB().getLugarDB().getNombre(), res).enqueue(new Callback<Orden>() {
             @Override
-            public void success(Orden orden, Response response) {
-                //Toast.makeText(FotoGraphActivity.this, "exito: " + orden.getIdorden(), Toast.LENGTH_LONG).show();
-                upLoadPicturesObjects(orden.getIdorden(), pg);
+            public void onResponse(Call<Orden> call, Response<Orden> response) {
+                if (response.body() != null) {
+                    upLoadPicturesObjects(response.body().getIdorden(), pg);
+                } else {
+                    if (LocalDBActivity.this != null) {
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                    }
+                }
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                pg.dismiss();
-                Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+            public void onFailure(Call<Orden> call, Throwable throwable) {
+                if (LocalDBActivity.this != null) {
+                    pg.dismiss();
+                    Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

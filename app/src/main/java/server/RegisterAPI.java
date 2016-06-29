@@ -2,12 +2,16 @@ package server;
 
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.http.Body;
-import retrofit.http.GET;
-import retrofit.http.POST;
-import retrofit.http.Path;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.ListaNombreEquipos;
@@ -17,20 +21,21 @@ import util.navigation.modelos.ListaNombreEquipos;
  * Created by marcoisaac on 5/19/2016.
  */
 public interface RegisterAPI {
-    //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources";
-    public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources";
+    public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
+    //public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
 
     public class Factory {
         private static RegisterAPI service;
 
         public static RegisterAPI getInstance() {
             if (service == null) {
-                RestAdapter restAdapter = new RestAdapter.Builder()
-                        .setEndpoint(RegisterAPI.BASE_URL)
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(RegisterAPI.BASE_URL)
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create())
                         .build();
 
-                final RegisterAPI service =
-                        restAdapter.create(RegisterAPI.class);
+                service = retrofit.create(RegisterAPI.class);
                 return service;
             } else {
                 return service;
@@ -39,21 +44,21 @@ public interface RegisterAPI {
     }
 
 
-    @GET("/generic")
-    public void getBarCode(Callback<String> cb);
+    @GET("generic")
+    public Call<String> getBarCode();
 
-    @GET("/generic/valide/{codigo}")
-    public void validateCode(@Path("codigo") String codigo, Callback<String> cb);
+    @GET("generic/valide/{codigo}")
+    public Call<String> validateCode(@Path("codigo") String codigo);
 
-    @GET("/com.mim.entities.listanombreequipos")
-    public void getListNombreEquipos(Callback<List<ListaNombreEquipos>> cb);
+    @GET("com.mim.entities.listanombreequipos")
+    public Call<List<ListaNombreEquipos>> getListNombreEquipos();
 
-    @GET("/com.mim.entities.listanombreequipos/params/{id}")
-    public void registerFactoryParams(@Path("id") int idlistaNombre, Callback<List<InformacionFabricante>> cb);
+    @GET("com.mim.entities.listanombreequipos/params/{id}")
+    public Call<List<InformacionFabricante>> registerFactoryParams(@Path("id") int idlistaNombre);
 
-    @POST("/com.mim.entities.equipo/{nombre}")
-    public void registerEquipment(@Path("nombre") String nombre, @Body Equipo equipo, Callback<Equipo> cb);
+    @POST("com.mim.entities.equipo/{nombre}")
+    public Call<Equipo> registerEquipment(@Path("nombre") String nombre, @Body Equipo equipo);
 
-    @POST("/com.mim.entities.informacionfabricante/{equipo}")
-    public void registerFactoryParams(@Path("equipo") int idEquipo, @Body List<InformacionFabricante> inf, Callback<InformacionFabricante> cb);
+    @POST("com.mim.entities.informacionfabricante/{equipo}")
+    public Call<InformacionFabricante> registerFactoryParams(@Path("equipo") int idEquipo, @Body List<InformacionFabricante> inf);
 }

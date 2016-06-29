@@ -37,9 +37,9 @@ import local_Db.OrdenDBDao;
 import local_db_activity_fragments.CameraLocalFragment;
 import register_activity_fragments.ChooseLineFragment;
 import register_activity_fragments.LineDialogFragment;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import server.OrdenAPI;
 import server.PhotoReportAPI;
 import util.navigation.CompresConsumer;
@@ -171,24 +171,28 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
         pg.show();
 
         PhotoReportAPI service = PhotoReportAPI.Factory.getInstance();
-        service.persistOrder(lugar, orden, new Callback<Orden>() {
+        service.persistOrder(lugar,orden).enqueue(new Callback<Orden>() {
             @Override
-            public void success(Orden orden, Response response) {
-                //Toast.makeText(FotoGraphActivity.this, "exito: " + orden.getIdorden(), Toast.LENGTH_LONG).show();
+            public void onResponse(Call<Orden> call, Response<Orden> response) {
                 if (FotoGraphActivity.this != null) {
-                    uploadPictures(orden.getIdorden(), pg);
+                    if(response.body()!=null) {
+                        uploadPictures(response.body().getIdorden(), pg);
+                    }else{
+                        if(FotoGraphActivity.this!=null) {
+                            Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
             }
 
             @Override
-            public void failure(RetrofitError error) {
+            public void onFailure(Call<Orden> call, Throwable throwable) {
                 if (FotoGraphActivity.this != null) {
                     pg.dismiss();
                     Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
                 }
             }
         });
-
     }
 
     @Override
@@ -270,34 +274,37 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     private void uploadPictures(final Integer idorden, final ProgressDialog pg) {
         if (photoList != null) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.persistPhotoObjects(idorden, photoList, new Callback<Foto>() {
+            service.persistPhotoObjects(idorden,photoList).enqueue(new Callback<Foto>() {
                 @Override
-                public void success(Foto foto, Response response) {
+                public void onResponse(Call<Foto> call, Response<Foto> response) {
                     pg.setMessage("subiendo imagenes.....");
-
                     fileUpload(idorden);
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    Toast.makeText(FotoGraphActivity.this, "hubo algun error fotos", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Foto> call, Throwable throwable) {
+                    if(FotoGraphActivity.this!=null) {
+                        Toast.makeText(FotoGraphActivity.this, "hubo algun error fotos", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } else {
 
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.markOrder(idOrden, new Callback<Orden>() {
+            service.markOrder(idorden).enqueue(new Callback<Orden>() {
                 @Override
-                public void success(Orden orden, Response response) {
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
                     pg.dismiss();
                     Toast.makeText(FotoGraphActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
                     closeService();
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    pg.dismiss();
-                    Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if(FotoGraphActivity.this!=null) {
+                        pg.dismiss();
+                        Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
@@ -323,9 +330,9 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
         if (res) {
 
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.markOrder(idOrden, new Callback<Orden>() {
+            service.markOrder(idOrden).enqueue(new Callback<Orden>() {
                 @Override
-                public void success(Orden orden, Response response) {
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
                     pg.dismiss();
                     Toast.makeText(FotoGraphActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
                     Log.d("RESULTADO_COMPRESION: ", "funciono");
@@ -333,9 +340,11 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
                 }
 
                 @Override
-                public void failure(RetrofitError error) {
-                    pg.dismiss();
-                    Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if(FotoGraphActivity.this!=null) {
+                        pg.dismiss();
+                        Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } else {
