@@ -46,6 +46,7 @@ import util.navigation.CompresConsumer;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.async_tasks.CompresImages;
+import util.navigation.async_tasks.Uploader;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
@@ -54,7 +55,8 @@ import util.navigation.modelos.Lugar;
 import util.navigation.modelos.Orden;
 
 public class FotoGraphActivity extends AppCompatActivity implements Navigator, ChooseLineFragment.LineConsumer
-        , OnclickLink, CameraFragment.PhotosConsumer, FotoDialogFragment.DialogConsumer, TrabajoFragment.PhotographicConsumer, CompresConsumer {
+        , OnclickLink, CameraFragment.PhotosConsumer, FotoDialogFragment.DialogConsumer, TrabajoFragment.PhotographicConsumer
+        , CompresConsumer, Uploader.UploaderConsumer {
 
     private String lugar;
     private List<Foto> photoList;
@@ -171,14 +173,14 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
         pg.show();
 
         PhotoReportAPI service = PhotoReportAPI.Factory.getInstance();
-        service.persistOrder(lugar,orden).enqueue(new Callback<Orden>() {
+        service.persistOrder(lugar, orden).enqueue(new Callback<Orden>() {
             @Override
             public void onResponse(Call<Orden> call, Response<Orden> response) {
                 if (FotoGraphActivity.this != null) {
-                    if(response.body()!=null) {
+                    if (response.body() != null) {
                         uploadPictures(response.body().getIdorden(), pg);
-                    }else{
-                        if(FotoGraphActivity.this!=null) {
+                    } else {
+                        if (FotoGraphActivity.this != null) {
                             Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
                         }
                     }
@@ -274,16 +276,16 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     private void uploadPictures(final Integer idorden, final ProgressDialog pg) {
         if (photoList != null) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
-            service.persistPhotoObjects(idorden,photoList).enqueue(new Callback<Foto>() {
+            service.persistPhotoObjects(idorden, photoList).enqueue(new Callback<Foto>() {
                 @Override
                 public void onResponse(Call<Foto> call, Response<Foto> response) {
-                    pg.setMessage("subiendo imagenes.....");
+                    pg.setMessage("comprimiendo imagenes.....");
                     fileUpload(idorden);
                 }
 
                 @Override
                 public void onFailure(Call<Foto> call, Throwable throwable) {
-                    if(FotoGraphActivity.this!=null) {
+                    if (FotoGraphActivity.this != null) {
                         Toast.makeText(FotoGraphActivity.this, "hubo algun error fotos", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -301,7 +303,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
 
                 @Override
                 public void onFailure(Call<Orden> call, Throwable throwable) {
-                    if(FotoGraphActivity.this!=null) {
+                    if (FotoGraphActivity.this != null) {
                         pg.dismiss();
                         Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
                     }
@@ -328,7 +330,30 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
     @Override
     public void compresResult(boolean res, int codigo) {
         if (res) {
+            sendToServer(idOrden);
+        } else {
+            Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
+            Log.d("RESULTADO_COMPRESION: ", "fallo");
+        }
+    }
 
+    private void sendToServer(int idOrden) {
+        if (photoList != null) {
+            if (photoList.size() > 0) {
+                pg.setMessage("Subiendo imagenes...");
+                Uploader task = new Uploader(this, 0);
+                Foto[] array = new Foto[photoList.size()];
+                for (int i = 0; i < photoList.size(); i++) {
+                    array[i] = photoList.get(i);
+                }
+                task.execute(array);
+            }
+        }
+    }
+
+    @Override
+    public void consumeUpload(boolean res, int codigo) {
+        if (res) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
             service.markOrder(idOrden).enqueue(new Callback<Orden>() {
                 @Override
@@ -341,15 +366,15 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
 
                 @Override
                 public void onFailure(Call<Orden> call, Throwable throwable) {
-                    if(FotoGraphActivity.this!=null) {
+                    if (FotoGraphActivity.this != null) {
                         pg.dismiss();
                         Toast.makeText(FotoGraphActivity.this, "hubo algun error marcando", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
-        } else {
-            Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
-            Log.d("RESULTADO_COMPRESION: ", "fallo");
+        }else{
+            pg.dismiss();
+            Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -359,4 +384,6 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
         startActivity(intent);
         finish();
     }
+
+
 }

@@ -49,6 +49,7 @@ import util.navigation.SerialListHolder;
 import util.navigation.async_tasks.CompresImages;
 import util.navigation.async_tasks.CompresImagesLocal;
 import util.navigation.async_tasks.ReportBuilder;
+import util.navigation.async_tasks.Uploader;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
 import util.navigation.modelos.ListaNombreEquipos;
@@ -58,7 +59,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         , OrdenInfoFragment.OrdenConsumer, ServicioLocalFragment.HistoryConsumerLocal
         , CameraLocalFragment.PhotosConsumer, ValueDialogPortableFragment.PortableDialogConsumer
         , PortableDialogItem, FotoDialogFragment.DialogConsumer, CompresConsumer
-        , TrabajoLocalFragment.PhotographicLocalConsumer {
+        , TrabajoLocalFragment.PhotographicLocalConsumer, Uploader.UploaderConsumer {
 
     private Boolean action_mode = false;
 
@@ -233,9 +234,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         service.persistOrder(orden).enqueue(new Callback<Orden>() {
             @Override
             public void onResponse(Call<Orden> call, Response<Orden> response) {
-                if(response.body()!=null) {
+                if (response.body() != null) {
                     upLoadHistoryDetails(response.body().getIdorden(), pg);
-                }else{
+                } else {
                     if (LocalDBActivity.this != null) {
                         pg.dismiss();
                         Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
@@ -293,7 +294,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             service.persistPhotoObjects(idorden, list).enqueue(new Callback<Foto>() {
                 @Override
                 public void onResponse(Call<Foto> call, Response<Foto> response) {
-                    pg.setMessage("subiendo imagenes.....");
+                    if (LocalDBActivity.this != null) {
+                        pg.setMessage("comprimiendo imagenes.....");
+                    }
                     LocalDBActivity.this.pg = pg;
                     fileUpload(idorden);
                 }
@@ -315,7 +318,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                     current.setMostrar(true);
                     session.getOrdenDBDao().update(current);
                     pg.dismiss();
-                    Toast.makeText(LocalDBActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    if (LocalDBActivity.this != null) {
+                        Toast.makeText(LocalDBActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    }
                     closeService();
                 }
 
@@ -349,27 +354,9 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         Log.d("comprees", "result: " + res + "  codigo: " + codigo);
         if (codigo == 0) {
             if (res) {
-                OrdenAPI service = OrdenAPI.Factory.getInstance();
-                service.markOrder(idOrden).enqueue(new Callback<Orden>() {
-                    @Override
-                    public void onResponse(Call<Orden> call, Response<Orden> response) {
-                        current.setMostrar(true);
-                        session.getOrdenDBDao().update(current);
-                        pg.dismiss();
-                        Toast.makeText(LocalDBActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
-                        Log.d("RESULTADO_COMPRESION: ", "funciono");
-                        closeService();
-                    }
-
-                    @Override
-                    public void onFailure(Call<Orden> call, Throwable throwable) {
-                        if (LocalDBActivity.this != null) {
-                            Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                sendToServer(idOrden);
             } else {
-                Toast.makeText(this, "Fallo en subida de imagenes", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Fallo en compresion de imagenes", Toast.LENGTH_SHORT).show();
                 Log.d("RESULTADO_COMPRESION: ", "fallo");
             }
         } else {
@@ -377,8 +364,53 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 pg.dismiss();
                 reportGen();
             } else {
-                Toast.makeText(this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                if (this != null) {
+                    Toast.makeText(this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                }
             }
+        }
+    }
+
+    private void sendToServer(int idOrden) {
+        if (list != null) {
+            if (list.size() > 0) {
+                pg.setMessage("Subiendo imagenes...");
+                Uploader task = new Uploader(this, 0);
+                Foto[] array = new Foto[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    array[i] = list.get(i);
+                }
+                task.execute(array);
+            }
+        }
+
+    }
+
+    @Override
+    public void consumeUpload(boolean res, int codigo) {
+        if (res) {
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.markOrder(idOrden).enqueue(new Callback<Orden>() {
+                @Override
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
+                    current.setMostrar(true);
+                    session.getOrdenDBDao().update(current);
+                    pg.dismiss();
+                    Toast.makeText(LocalDBActivity.this, "Reporte subido exitosamente", Toast.LENGTH_SHORT).show();
+                    Log.d("RESULTADO_COMPRESION: ", "funciono");
+                    closeService();
+                }
+
+                @Override
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if (LocalDBActivity.this != null) {
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        } else {
+            pg.dismiss();
+            Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -605,4 +637,8 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             super.onBackPressed();
         }
     }
+
+
 }
+
+

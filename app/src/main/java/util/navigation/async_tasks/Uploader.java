@@ -10,9 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -24,15 +22,18 @@ import util.navigation.modelos.Foto;
 /**
  * Created by marcoisaac on 5/20/2016.
  */
-public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
+public class Uploader extends AsyncTask<Foto, Void, Boolean> {
 
 
     private int codigo;
 
+    public interface UploaderConsumer{
+        public void consumeUpload(boolean res,int codigo);
+    }
 
-    private CompresConsumer consumer;
+    private UploaderConsumer consumer;
 
-    public CompresImages(CompresConsumer consumer, int codigo) {
+    public Uploader(UploaderConsumer consumer, int codigo) {
         this.consumer = consumer;
         this.codigo = codigo;
     }
@@ -44,54 +45,27 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
 
             String ruta = foto.getArchivo();
             File rep = new File(ruta);
-            if (getFileSizeInMB(foto.getArchivo()) > 1) {
-                Bitmap bit = BitmapFactory.decodeFile(ruta);
-                if (bit != null) {
-                    try {
 
-                        OutputStream stream = new FileOutputStream(rep);
-                        bit.compress(Bitmap.CompressFormat.JPEG, 60, stream);
-                        stream.flush();
-                        stream.close();
-                        Log.d("ASYNC_TASK", rep.getName());
-
-                       /* RequestBody requestFile =
-                                RequestBody.create(MediaType.parse("image/jpeg"), rep);
+            RequestBody requestFile =
+                    RequestBody.create(MediaType.parse("image/jpeg"), rep);
 
 
-
-                        Call<ResponseBody> res = service.uploadImage2(rep.getName(), requestFile);
-                        Response<ResponseBody> response = res.execute();
-
-                        if (response != null) {
-                            if (!(response.isSuccessful())) {
-                                return false;
-                            }
-                        }*/
-                    } catch (IOException e) {
-                        return false;
-                    }
-                }
-            } /*else {
-                RequestBody requestFile =
-                        RequestBody.create(MediaType.parse("image/jpeg"), rep);
-
-
-
-                Call<ResponseBody> res = service.uploadImage2(rep.getName(), requestFile);
-                Response<ResponseBody> response = null;
-                try {
-                    response = res.execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+            Call<ResponseBody> res = service.uploadImage2(rep.getName(), requestFile);
+            Response<ResponseBody> response = null;
+            try {
+                response = res.execute();
                 if (response != null) {
                     if (!(response.isSuccessful())) {
                         return false;
                     }
+                }else{
+                    return false;
                 }
-            }*/
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
         }
         return true;
     }
@@ -100,7 +74,7 @@ public class CompresImages extends AsyncTask<Foto, Void, Boolean> {
     protected void onPostExecute(Boolean aBoolean) {
         super.onPostExecute(aBoolean);
         if (consumer != null) {
-            consumer.compresResult(aBoolean, codigo);
+            consumer.consumeUpload(aBoolean, codigo);
         }
     }
 

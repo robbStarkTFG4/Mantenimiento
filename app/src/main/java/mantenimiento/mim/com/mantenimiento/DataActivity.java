@@ -43,6 +43,7 @@ import util.navigation.Navigator;
 import util.navigation.PortableDialogItem;
 import util.navigation.SerialListHolder;
 import util.navigation.async_tasks.CompresImages;
+import util.navigation.async_tasks.Uploader;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
@@ -53,7 +54,7 @@ import util.navigation.modelos.Orden;
 public class DataActivity extends AppCompatActivity implements Navigator, FotoDialogFragment.DialogConsumer
         , CameraFragment.PhotosConsumer, BarcodeReaderFragment.EquipmentConsumer
         , OrdenFragment.OrdenConsumer, ServicioFragment.HistoryConsumer, CompresConsumer
-        , PortableDialogItem, ValueDialogPortableFragment.PortableDialogConsumer {
+        , PortableDialogItem, ValueDialogPortableFragment.PortableDialogConsumer, Uploader.UploaderConsumer {
 
     private FragmentManager manager;
     private List<Foto> list;
@@ -217,9 +218,9 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         service.persistOrder(orden).enqueue(new Callback<Orden>() {
             @Override
             public void onResponse(Call<Orden> call, Response<Orden> response) {
-                if(response.body()!=null) {
+                if (response.body() != null) {
                     upLoadHistoryDetails(response.body().getIdorden(), pg);
-                }else{
+                } else {
                     if (DataActivity.this != null) {
                         pg.dismiss();
                         Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
@@ -352,7 +353,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
             service.persistPhotoObjects(idorden, list).enqueue(new Callback<Foto>() {
                 @Override
                 public void onResponse(Call<Foto> call, Response<Foto> response) {
-                    pg.setMessage("subiendo imagenes.....");
+                    pg.setMessage("comprimiendo imagenes.....");
                     DataActivity.this.pg = pg;
                     fileUpload(idorden);
                 }
@@ -403,6 +404,31 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     @Override
     public void compresResult(boolean res, int codigo) {
         if (res) {
+            sendToServer(idCurrentOrden);
+        } else {
+            Toast.makeText(this, "Fallo en compresion", Toast.LENGTH_SHORT).show();
+            Log.d("RESULTADO_COMPRESION: ", "fallo");
+        }
+    }
+
+    private void sendToServer(int idCurrentOrden) {
+
+        if (list != null) {
+            if (list.size() > 0) {
+                pg.setMessage("Subiendo imagenes...");
+                Uploader task = new Uploader(this, 0);
+                Foto[] array = new Foto[list.size()];
+                for (int i = 0; i < list.size(); i++) {
+                    array[i] = list.get(i);
+                }
+                task.execute(array);
+            }
+        }
+    }
+
+    @Override
+    public void consumeUpload(boolean res, int codigo) {
+        if (res) {
             OrdenAPI service = OrdenAPI.Factory.getInstance();
             service.markOrder(idCurrentOrden).enqueue(new Callback<Orden>() {
                 @Override
@@ -411,6 +437,8 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                     Toast.makeText(DataActivity.this, "Reporte procesado", Toast.LENGTH_SHORT).show();
                     Log.d("RESULTADO_COMPRESION: ", "funciono");
                     closeService();
+                    // Toast.makeText(DataActivity.this, "Subiendo imagenes...", Toast.LENGTH_SHORT).show();
+                    //sendToServer(DataActivity.this.idCurrentOrden);
                 }
 
                 @Override
@@ -420,9 +448,9 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
                     }
                 }
             });
-        } else {
-            Toast.makeText(this, "Fallo en compresion", Toast.LENGTH_SHORT).show();
-            Log.d("RESULTADO_COMPRESION: ", "fallo");
+        }else{
+            pg.dismiss();
+            Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -444,4 +472,6 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
         ServicioFragment serv = (ServicioFragment) manager.findFragmentByTag("servNet");
         serv.setValue(valor, currentPortablePos);
     }
+
+
 }

@@ -1,9 +1,9 @@
 package server;
 
 import java.util.List;
-
-
+import java.util.concurrent.TimeUnit;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -30,16 +30,23 @@ import util.navigation.modelos.Orden;
  * Created by marcoisaac on 5/19/2016.
  */
 public interface OrdenAPI {
-    public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
-    // public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
+    //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
+     public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
 
     public class Factory {
         private static OrdenAPI service;
 
         public static OrdenAPI getInstance() {
             if (service == null) {
+
+                final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .connectTimeout(60, TimeUnit.SECONDS)
+                        .build();
+
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(OrdenAPI.BASE_URL)
+                        .client(okHttpClient)
                         .addConverterFactory(ScalarsConverterFactory.create())
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
