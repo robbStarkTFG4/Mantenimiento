@@ -13,4 +13,9 @@
         android:title="archivo"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/create_order"
+        android:icon="@drawable/ic_description_black_24dp"
+        android:title="nueva orden"
+        app:showAsAction="ifRoom" />
 </menu>

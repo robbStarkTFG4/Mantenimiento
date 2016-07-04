@@ -105,19 +105,6 @@ public class TypeFragment extends Fragment implements OnclickLink {
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-       /* Thread thread = new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    sleep(5000);
-                    handler.sendMessage(new Message());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        thread.start();*/
         RegisterAPI service = RegisterAPI.Factory.getInstance();
         service.getListNombreEquipos().enqueue(new Callback<List<ListaNombreEquipos>>() {
             @Override

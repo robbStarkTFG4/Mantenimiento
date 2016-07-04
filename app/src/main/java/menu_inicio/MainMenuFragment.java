@@ -60,6 +60,9 @@ public class MainMenuFragment extends Fragment {
             case R.id.repFoto:
                 startActivity(new Intent(getContext(), FotoGraphActivity.class));
                 break;
+            case R.id.create_order:
+                navigator.navigate("newOrder");
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

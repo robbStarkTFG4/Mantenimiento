@@ -29,8 +29,8 @@ import util.navigation.modelos.Orden;
  * Created by marcoisaac on 5/19/2016.
  */
 public interface PhotoReportAPI {
-    //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
-    public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
+    public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
+    //public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
 
     public class Factory {
         private static PhotoReportAPI service;
@@ -55,6 +55,9 @@ public interface PhotoReportAPI {
 
     @POST("com.mim.entities.orden/reportphoto/{lugar}")
     public Call<Orden> persistOrder(@Path("lugar") String lugar, @Body Orden orden);
+
+    @POST("com.mim.entities.orden/orderMode/{lugar}")
+    public Call<Orden> persistOrderMode(@Path("lugar") String lugar, @Body Orden orden);
 
     @POST("com.mim.entities.fotos/objetos/{id}")
     public Call<Foto>  persistPhotoObjects(@Path("id") int id, @Body List<Foto> list);

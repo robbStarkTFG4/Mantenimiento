@@ -70,6 +70,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
     private SQLiteDatabase db;
     private DaoMaster master;
     public DaoSession session;
+
     private int currentPortablePos;
     private String codigo = "";
     private int idCurrentOrden;

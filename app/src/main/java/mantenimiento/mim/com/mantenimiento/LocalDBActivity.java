@@ -230,28 +230,54 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         pg.setMessage("espera un momento...");
         pg.setCanceledOnTouchOutside(false);
         pg.show();
-        OrdenAPI service = OrdenAPI.Factory.getInstance();
-        service.persistOrder(orden).enqueue(new Callback<Orden>() {
-            @Override
-            public void onResponse(Call<Orden> call, Response<Orden> response) {
-                if (response.body() != null) {
-                    upLoadHistoryDetails(response.body().getIdorden(), pg);
-                } else {
+        if (!orden.getEquipoIdequipo().getNumeroEquipo().equals("n/a")) {
+            OrdenAPI service = OrdenAPI.Factory.getInstance();
+            service.persistOrder(orden).enqueue(new Callback<Orden>() {
+                @Override
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
+                    if (response.body() != null) {
+                        upLoadHistoryDetails(response.body().getIdorden(), pg);
+                    } else {
+                        if (LocalDBActivity.this != null) {
+                            pg.dismiss();
+                            Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Orden> call, Throwable throwable) {
                     if (LocalDBActivity.this != null) {
                         pg.dismiss();
                         Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
                     }
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Orden> call, Throwable throwable) {
-                if (LocalDBActivity.this != null) {
-                    pg.dismiss();
-                    Toast.makeText(LocalDBActivity.this, "hubo algun error 1", Toast.LENGTH_LONG).show();
+            });
+        } else {
+            PhotoReportAPI service = PhotoReportAPI.Factory.getInstance();
+            service.persistOrderMode(orden.getEquipoIdequipo().getLugarIdlugar().getNombre(), orden).enqueue(new Callback<Orden>() {
+                @Override
+                public void onResponse(Call<Orden> call, Response<Orden> response) {
+                    if (LocalDBActivity.this != null) {
+                        if (response.body() != null) {
+                            upLoadHistoryDetails(response.body().getIdorden(), pg);
+                        } else {
+                            if (LocalDBActivity.this != null) {
+                                Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }
                 }
-            }
-        });
+
+                @Override
+                public void onFailure(Call<Orden> call, Throwable throwable) {
+                    if (LocalDBActivity.this != null) {
+                        pg.dismiss();
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
     }
 
     @Override

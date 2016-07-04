@@ -21,28 +21,6 @@ public class Main extends AppCompatActivity implements Navigator {
     @Override
     protected void onStart() {
         super.onStart();
-        /*if (getIntent().getStringExtra("codigo") != null) {
-            this.codigo = getIntent().getStringExtra("codigo");
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setMessage("continuar con reporte?").setNegativeButton("cancelar", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
-                    .setPositiveButton("aceptar", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(Main.this, codigo, Toast.LENGTH_SHORT).show();
-                            getIntent().removeExtra("codigo");
-                            Intent intent = new Intent(Main.this, DataActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putString("codigo", codigo);
-                            intent.putExtras(bundle);
-                            startActivity(intent);
-                        }
-                    }).create();
-            dialog.show();
-        }*/
     }
 
     @Override
@@ -70,6 +48,10 @@ public class Main extends AppCompatActivity implements Navigator {
                 break;
             case "leerCodigo":
                 intent = new Intent(this, DataActivity.class);
+                startActivity(intent);
+                break;
+            case "newOrder":
+                intent = new Intent(this, OrderModeActivity.class);
                 startActivity(intent);
                 break;
         }
