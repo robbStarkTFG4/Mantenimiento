@@ -451,7 +451,7 @@ public class DataActivity extends AppCompatActivity implements Navigator, FotoDi
             });
         }else{
             pg.dismiss();
-            Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DataActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
         }
     }
 

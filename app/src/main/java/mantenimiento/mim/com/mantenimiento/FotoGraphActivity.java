@@ -374,7 +374,7 @@ public class FotoGraphActivity extends AppCompatActivity implements Navigator, C
             });
         }else{
             pg.dismiss();
-            Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(FotoGraphActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
         }
     }
 

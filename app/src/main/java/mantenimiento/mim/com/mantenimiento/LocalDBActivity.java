@@ -436,7 +436,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             });
         } else {
             pg.dismiss();
-            Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
         }
     }
 

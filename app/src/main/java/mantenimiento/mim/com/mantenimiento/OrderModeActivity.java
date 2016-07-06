@@ -122,7 +122,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
                 manager.beginTransaction().replace(R.id.content_order_mode, new ChooseLineFragment(), "place").addToBackStack(null).commit();
                 break;
             case "tipo":
-                manager.beginTransaction().replace(R.id.content_order_mode, new OrdenFragment()).addToBackStack(null).commit();
+                manager.beginTransaction().replace(R.id.content_order_mode, OrdenFragment.newInstance(currentLine,null)).addToBackStack(null).commit();
                 break;
             case "servicio":
                 manager.beginTransaction().replace(R.id.content_order_mode, new TypeFragment()).addToBackStack(null).commit();
@@ -468,7 +468,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
             });
         } else {
             pg.dismiss();
-            Toast.makeText(OrderModeActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(OrderModeActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
         }
     }
 

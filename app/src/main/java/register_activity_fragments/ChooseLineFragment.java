@@ -112,7 +112,8 @@ public class ChooseLineFragment extends Fragment {
 
     private void dataSetUp() {
         dataList = new ArrayList<>();
-        dataList.add(new Lugar("linea 10"));
+        //cerve
+       /* dataList.add(new Lugar("linea 10"));
         dataList.add(new Lugar("linea 30"));
         dataList.add(new Lugar("linea 40"));
         dataList.add(new Lugar("linea 50"));
@@ -121,7 +122,19 @@ public class ChooseLineFragment extends Fragment {
         dataList.add(new Lugar("cocimientos"));
         dataList.add(new Lugar("fermentacion"));
         dataList.add(new Lugar("reposo"));
-        dataList.add(new Lugar("fuerza motriz"));
+        dataList.add(new Lugar("fuerza motriz"));*/
+
+        //cemex
+        dataList.add(new Lugar("PD0665"));
+        dataList.add(new Lugar("PD0300"));
+        dataList.add(new Lugar("PD057"));
+        dataList.add(new Lugar("PD442"));
+        dataList.add(new Lugar("PD477"));
+        dataList.add(new Lugar("PD327"));
+        dataList.add(new Lugar("PD183"));
+        dataList.add(new Lugar("PD268"));
+        dataList.add(new Lugar("PD402"));
+        dataList.add(new Lugar("PD471"));
     }
 
     @Override
