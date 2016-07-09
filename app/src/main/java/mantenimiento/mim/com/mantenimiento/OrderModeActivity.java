@@ -72,6 +72,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
     private DaoMaster master;
     public DaoSession session;
     private int currentPortablePos;
+    private String codigo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
 
     @Override
     public void barCodeResult(String code) {
-
+       this.codigo=code;
     }
 
     @Override
@@ -122,7 +123,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
                 manager.beginTransaction().replace(R.id.content_order_mode, new ChooseLineFragment(), "place").addToBackStack(null).commit();
                 break;
             case "tipo":
-                manager.beginTransaction().replace(R.id.content_order_mode, OrdenFragment.newInstance(currentLine,null)).addToBackStack(null).commit();
+                manager.beginTransaction().replace(R.id.content_order_mode, OrdenFragment.newInstance(codigo,null)).addToBackStack(null).commit();
                 break;
             case "servicio":
                 manager.beginTransaction().replace(R.id.content_order_mode, new TypeFragment()).addToBackStack(null).commit();

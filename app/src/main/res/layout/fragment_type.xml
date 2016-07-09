@@ -8,25 +8,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:weightSum="1">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Selecciona tipo de equipo"
-            android:textSize="25dp" />
-
-        <EditText
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="escribe tipo"
-            android:visibility="gone" />
+            android:layout_weight=".1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecciona tipo de equipo"
+                android:textSize="25dp" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="escribe tipo"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
 
         <util.navigation.custom.recycler.RecyclerViewEmpty
             android:id="@+id/tipos_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:layout_weight=".9"
+            android:scrollbars="vertical" />
 
         <TextView
             android:id="@+id/empty_view_tipos"

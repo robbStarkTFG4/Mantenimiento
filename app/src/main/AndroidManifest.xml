@@ -45,7 +45,10 @@
             android:label="@string/title_activity_foto_graph"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".OrderModeActivity"></activity>
+        <activity android:name=".OrderModeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_foto_graph"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
