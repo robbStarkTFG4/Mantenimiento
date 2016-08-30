@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import data_activity_fragments.FotoDialogFragment;
@@ -71,7 +73,8 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     private RecyclerViewEmpty.LayoutManager mLayoutManager;
 
     private List<FotoDB> dataList = new ArrayList<>();
-    private List<FotoDB> blackList = new ArrayList<>();
+    //private List<FotoDB> blackList = new ArrayList<>();
+    private Map<Integer, FotoDB> blackList = new HashMap<>();
     private FloatingActionButton floatButton;
     private String ruta;
 
@@ -362,7 +365,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     }
 
     public void addElementToBlackList(int position) {
-        blackList.add(dataList.get(position));
+        blackList.put(position, dataList.get(position));
     }
 
     public void removeFromBlackList(int position) {
@@ -403,8 +406,19 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
         foto.show(getFragmentManager(), "dialog");
     }
 
+    @Override
+    public boolean checkPosition(int position) {
+        if (blackList.get(position) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void purgeList() {
-        for (FotoDB ft : blackList) {
+        for (Map.Entry<Integer, FotoDB> entry : blackList.entrySet()) {
+            Integer key = entry.getKey();
+            FotoDB ft = entry.getValue();
             dataList.remove(ft);
         }
         mAdapter.notifyDataSetChanged();
@@ -430,7 +444,7 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
     public interface PhotosConsumer {
         public void setPhotosList(List<FotoDB> list);
 
-        public void setBlackList(List<FotoDB> blackList);
+        public void setBlackList(Map<Integer, FotoDB> blackList);
 
         public List<FotoDB> getPhotosList();
 

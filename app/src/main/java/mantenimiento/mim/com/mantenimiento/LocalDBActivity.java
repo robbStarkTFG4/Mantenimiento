@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import data_activity_fragments.FotoDialogFragment;
 import local_Db.DaoMaster;
@@ -75,7 +76,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     private int currentItem;
     private ProgressDialog pg;
     private List<Foto> list;
-    private List<FotoDB> blackList;
+    private Map<Integer, FotoDB> blackList;
     private int idOrden;
     //End database objects
 
@@ -263,7 +264,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                             upLoadHistoryDetails(response.body().getIdorden(), pg);
                         } else {
                             if (LocalDBActivity.this != null) {
-                                Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                                Toast.makeText(LocalDBActivity.this, "hubo algun error orderMode es nulo", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
@@ -273,7 +274,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 public void onFailure(Call<Orden> call, Throwable throwable) {
                     if (LocalDBActivity.this != null) {
                         pg.dismiss();
-                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error orderMode fallo request", Toast.LENGTH_LONG).show();
                     }
                 }
             });
@@ -353,7 +354,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 @Override
                 public void onFailure(Call<Orden> call, Throwable throwable) {
                     if (LocalDBActivity.this != null) {
-                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error validar", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -391,7 +392,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 reportGen();
             } else {
                 if (this != null) {
-                    Toast.makeText(this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "hubo algun error en compresion", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -430,13 +431,13 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                 @Override
                 public void onFailure(Call<Orden> call, Throwable throwable) {
                     if (LocalDBActivity.this != null) {
-                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error validar", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         } else {
             pg.dismiss();
-            Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+            Toast.makeText(LocalDBActivity.this, "hubo algun error validar", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -485,9 +486,14 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         if (blackList != null) {
             Log.d("HAY ELEMENTOS", "ELEMENTOS");
             if (blackList.size() > 0) {
-                for (FotoDB ft : blackList) {
+                for (Map.Entry<Integer, FotoDB> entry : blackList.entrySet()) {
+                    Integer key = entry.getKey();
+                    FotoDB ft = entry.getValue();
                     session.getFotoDBDao().delete(ft);
                 }
+                /*for (FotoDB ft : blackList) {
+                    session.getFotoDBDao().delete(ft);
+                }*/
             }
         }
 
@@ -501,9 +507,10 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
     }
 
     @Override
-    public void setBlackList(List<FotoDB> blackList) {
+    public void setBlackList(Map<Integer, FotoDB> blackList) {
         this.blackList = blackList;
     }
+
 
     @Override
     public List<FotoDB> getPhotosList() {
@@ -574,7 +581,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
                     upLoadPicturesObjects(response.body().getIdorden(), pg);
                 } else {
                     if (LocalDBActivity.this != null) {
-                        Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(LocalDBActivity.this, "hubo algun error persist", Toast.LENGTH_LONG).show();
                     }
                 }
             }
@@ -583,7 +590,7 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
             public void onFailure(Call<Orden> call, Throwable throwable) {
                 if (LocalDBActivity.this != null) {
                     pg.dismiss();
-                    Toast.makeText(LocalDBActivity.this, "hubo algun error", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LocalDBActivity.this, "hubo algun error persist", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -611,9 +618,16 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         if (blackList != null) {
             Log.d("HAY ELEMENTOS", "ELEMENTOS");
             if (blackList.size() > 0) {
-                for (FotoDB ft : blackList) {
+
+                for (Map.Entry<Integer, FotoDB> entry : blackList.entrySet()) {
+                    Integer key = entry.getKey();
+                    FotoDB ft = entry.getValue();
                     session.getFotoDBDao().delete(ft);
                 }
+
+               /* for (FotoDB ft : blackList) {
+                    session.getFotoDBDao().delete(ft);
+                }*/
             }
         }
         closeService();

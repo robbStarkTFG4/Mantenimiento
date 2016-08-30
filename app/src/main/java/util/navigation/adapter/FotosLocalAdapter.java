@@ -77,14 +77,14 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
         private final TextView descripcion;
         private final ImageView image;
         private final BlackBasket basket;
-        private FragmentManager manager;
-        public CheckBox check;
 
+        public CardView parent;
         private OnclickLink link;
 
-        public ViewHolder(CardView v, final BlackBasket basket, OnclickLink link) {
+        public ViewHolder(CardView v, final BlackBasket basket, OnclickLink link, final Context context) {
             super(v);
-            this.manager = manager;
+            this.parent = v;
+
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
             this.basket = basket;
@@ -92,11 +92,12 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
             title = (TextView) v.findViewById(R.id.description_corta);
             descripcion = (TextView) v.findViewById(R.id.description_larga);
             image = (ImageView) v.findViewById(R.id.imagen_cartita);
-            check = (CheckBox) v.findViewById(R.id.check_cartas);
+            CheckBox check = (CheckBox) v.findViewById(R.id.check_cartas);
 
             check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Toast.makeText(context, "posicion: " + getLayoutPosition(), Toast.LENGTH_SHORT).show();
                     if (isChecked) {
                         basket.addElementToBlackList(getLayoutPosition());
                     } else {
@@ -128,7 +129,7 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
 
         CardView v = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.cartas, parent, false);
 
-        ViewHolder vh = new ViewHolder(v, basket, this);
+        ViewHolder vh = new ViewHolder(v, basket, this, context);
         return vh;
     }
 
@@ -138,9 +139,16 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
 
 
         if (basket.getBoolean()) {
-            holder.check.setVisibility(View.VISIBLE);
+            holder.parent.findViewById(R.id.check_cartas).setVisibility(View.VISIBLE);
+            //holder.check.setVisibility(View.VISIBLE);
         } else {
-            holder.check.setVisibility(View.GONE);
+            holder.parent.findViewById(R.id.check_cartas).setVisibility(View.GONE);
+        }
+
+        if (basket.checkPosition(position)) {
+            ((CheckBox) holder.parent.findViewById(R.id.check_cartas)).setChecked(true);
+        } else {
+            ((CheckBox) holder.parent.findViewById(R.id.check_cartas)).setChecked(false);
         }
 
         FotoDB foto = mDataset.get(position);
