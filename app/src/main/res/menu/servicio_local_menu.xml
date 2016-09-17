@@ -25,4 +25,10 @@
         android:title="crear localmente"
         app:showAsAction="never"></item>
 
+    <item
+        android:id="@+id/agregar_parametro_service_local"
+        android:orderInCategory="200"
+        android:title="agregar parametro"
+        app:showAsAction="never"></item>
+
 </menu>

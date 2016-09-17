@@ -465,7 +465,16 @@ public class LocalDBActivity extends AppCompatActivity implements Navigator, Onc
         HistorialDetallesDBDao hisDao = session.getHistorialDetallesDBDao();
         for (int i = 0; i < historial.size(); i++) {
             HistorialDetallesDB temp = historial.get(i);
-            hisDao.update(temp);
+            if (temp.getId() != null) {
+                Log.d("ACTUALIZANDO","insertando nuevo parametro");
+                hisDao.update(temp);
+            } else {
+                Log.d("INSERT","insertando nuevo parametro");
+
+               temp.setOrdenDB(current);
+                hisDao.insert(temp);
+            }
+
         }
 
         if (fotoList != null) {

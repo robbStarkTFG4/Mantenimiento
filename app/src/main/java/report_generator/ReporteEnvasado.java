@@ -194,6 +194,10 @@ public class ReporteEnvasado {
         String area;
         if (lugar.getNombre().contains("linea")) {
             area = "envasado";
+        } else if (lugar.getNombre().contains("otro")) {
+            area = "Tecate 500";
+        }else if (lugar.getNombre().contains("PD")) {
+            area = "concretos";
         } else {
             area = "elaboracion";
         }

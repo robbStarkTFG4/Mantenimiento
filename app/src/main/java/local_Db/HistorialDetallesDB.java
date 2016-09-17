@@ -31,6 +31,11 @@ public class HistorialDetallesDB implements Serializable{
     public HistorialDetallesDB() {
     }
 
+    public HistorialDetallesDB(String parametro, String valor) {
+        this.parametro = parametro;
+        this.valor = valor;
+    }
+
     public HistorialDetallesDB(Long id) {
         this.id = id;
     }

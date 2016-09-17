@@ -45,7 +45,7 @@ public class ChooseLineFragment extends Fragment {
     private Button btn;
     private LineConsumer lineConsumer;
     private String nombre = null;
-    private boolean control=false;
+    private boolean control = false;
 
     public ChooseLineFragment() {
         // Required empty public constructor
@@ -113,7 +113,7 @@ public class ChooseLineFragment extends Fragment {
     private void dataSetUp() {
         dataList = new ArrayList<>();
         //cerve
-       dataList.add(new Lugar("linea 10"));
+        /*dataList.add(new Lugar("linea 10"));
         dataList.add(new Lugar("linea 30"));
         dataList.add(new Lugar("linea 40"));
         dataList.add(new Lugar("linea 50"));
@@ -125,6 +125,7 @@ public class ChooseLineFragment extends Fragment {
         dataList.add(new Lugar("fuerza motriz"));
         dataList.add(new Lugar("calderas"));
         dataList.add(new Lugar("adjunto liquido"));
+        dataList.add(new Lugar("otro"));*/
 
         //cemex
         dataList.add(new Lugar("PD0665"));
@@ -141,6 +142,18 @@ public class ChooseLineFragment extends Fragment {
         dataList.add(new Lugar("PD294"));
         dataList.add(new Lugar("PD304"));
         dataList.add(new Lugar("PD109"));
+        //
+        dataList.add(new Lugar("PD0056"));
+        dataList.add(new Lugar("PD0055"));
+        dataList.add(new Lugar("PD0057"));
+        dataList.add(new Lugar("PD0304"));
+        dataList.add(new Lugar("PD0665"));
+        dataList.add(new Lugar("PD0311"));
+        dataList.add(new Lugar("PD0442"));
+        dataList.add(new Lugar("PD0410"));
+        dataList.add(new Lugar("PD0300"));
+        dataList.add(new Lugar("PD0109"));
+
     }
 
     @Override
@@ -165,7 +178,7 @@ public class ChooseLineFragment extends Fragment {
     }
 
     public void setSelectedLine(int selectedLine) {
-        control=true;
+        control = true;
         dialog.dismiss();
         nombre = dataList.get(selectedLine).getNombre();
         btn.setText(nombre);

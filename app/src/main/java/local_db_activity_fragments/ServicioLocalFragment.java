@@ -4,6 +4,7 @@ package local_db_activity_fragments;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,6 +53,7 @@ public class ServicioLocalFragment extends Fragment {
 
     private List<HistorialDetallesDB> dataList;
     private HistoryConsumerLocal consumer;
+    private FloatingActionButton floatButton;
 
     public ServicioLocalFragment() {
         // Required empty public constructor
@@ -92,7 +94,21 @@ public class ServicioLocalFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.servicio_local_fragment, container, false);
         recyclerSetUp(view);
+        widgetSetUp(view);
         return view;
+    }
+
+    private void widgetSetUp(View view) {
+        floatButton = (FloatingActionButton) view.findViewById(R.id.fab_service_parameter_local);
+        floatButton.setOnClickListener(new FloatingActionButton.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HistorialDetallesDB comentario = new HistorialDetallesDB("comentario", "");
+                dataList.add(comentario);
+                mAdapter.notifyDataSetChanged();
+                mRecyclerView.scrollToPosition(dataList.size() - 1);
+            }
+        });
     }
 
 
@@ -172,6 +188,11 @@ public class ServicioLocalFragment extends Fragment {
                 } catch (BadElementException e) {
                     e.printStackTrace();
                 }
+                break;
+
+            case R.id.agregar_parametro_service_local:
+                dataList.add(new HistorialDetallesDB("comentario", ""));
+                mAdapter.notifyDataSetChanged();
                 break;
         }
         return super.onOptionsItemSelected(item);
