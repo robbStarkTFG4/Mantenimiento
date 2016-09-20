@@ -17,6 +17,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import util.navigation.WorkServer;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
@@ -30,24 +31,27 @@ import util.navigation.modelos.Orden;
  */
 public interface PhotoReportAPI {
     //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
-    //public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
-    public static final String BASE_URL = "http://cemex-5266592.jl.serv.net.mx/rest/webresources/";
+    // public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
+    //public static final String BASE_URL = "http://cemex-5266592.jl.serv.net.mx/rest/webresources/";
 
     public class Factory {
         private static PhotoReportAPI service;
 
         public static PhotoReportAPI getInstance() {
-            if (service == null) {
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(PhotoReportAPI.BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
+            //if (service == null) {
 
-                service = retrofit.create(PhotoReportAPI.class);
-                return service;
-            } else {
-                return service;
-            }
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    //.baseUrl(instance.getBASE_URL())
+                    .baseUrl(WorkServer.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            service = retrofit.create(PhotoReportAPI.class);
+            return service;
+            // } else {
+            //     return service;
+            // }
 
         }
     }
@@ -61,7 +65,7 @@ public interface PhotoReportAPI {
     public Call<Orden> persistOrderMode(@Path("lugar") String lugar, @Body Orden orden);
 
     @POST("com.mim.entities.fotos/objetos/{id}")
-    public Call<Foto>  persistPhotoObjects(@Path("id") int id, @Body List<Foto> list);
+    public Call<Foto> persistPhotoObjects(@Path("id") int id, @Body List<Foto> list);
 
     //upload picture
 

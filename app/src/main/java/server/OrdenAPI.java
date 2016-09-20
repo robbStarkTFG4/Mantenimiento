@@ -2,6 +2,7 @@ package server;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -18,6 +19,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import util.navigation.WorkServer;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.Foto;
 import util.navigation.modelos.HistorialDetalles;
@@ -31,32 +33,34 @@ import util.navigation.modelos.Orden;
  */
 public interface OrdenAPI {
     //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
-     //public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
-    public static final String BASE_URL = "http://cemex-5266592.jl.serv.net.mx/rest/webresources/";
+    //public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
+    //public static final String BASE_URL = "http://cemex-5266592.jl.serv.net.mx/rest/webresources/";
 
     public class Factory {
         private static OrdenAPI service;
 
         public static OrdenAPI getInstance() {
-            if (service == null) {
+            //if (service == null) {
 
-                final OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                        .readTimeout(60, TimeUnit.SECONDS)
-                        .connectTimeout(60, TimeUnit.SECONDS)
-                        .build();
+            final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .build();
 
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(OrdenAPI.BASE_URL)
-                        .client(okHttpClient)
-                        .addConverterFactory(ScalarsConverterFactory.create())
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
 
-                service = retrofit.create(OrdenAPI.class);
-                return service;
-            } else {
-                return service;
-            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    //.baseUrl(instance.getBASE_URL())
+                    .baseUrl(WorkServer.BASE_URL)
+                    .client(okHttpClient)
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            service = retrofit.create(OrdenAPI.class);
+            return service;
+            // } else {
+            // return service;
+            //}
         }
     }
 
@@ -90,5 +94,5 @@ public interface OrdenAPI {
     //upload picture
     @Multipart
     @POST("com.mim.entities.fotos/prime")
-    public Call<ResponseBody> uploadImage2(@Part("id") String id, @Part("file") RequestBody  imagen);
+    public Call<ResponseBody> uploadImage2(@Part("id") String id, @Part("file") RequestBody imagen);
 }

@@ -17,6 +17,7 @@ import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.SerialListHolder;
+import util.navigation.WorkServer;
 import util.navigation.modelos.Lugar;
 
 /**
@@ -113,47 +114,51 @@ public class ChooseLineFragment extends Fragment {
     private void dataSetUp() {
         dataList = new ArrayList<>();
         //cerve
-        /*dataList.add(new Lugar("linea 10"));
-        dataList.add(new Lugar("linea 30"));
-        dataList.add(new Lugar("linea 40"));
-        dataList.add(new Lugar("linea 50"));
-        dataList.add(new Lugar("linea 60"));
-        dataList.add(new Lugar("refrigeracion"));
-        dataList.add(new Lugar("cocimientos"));
-        dataList.add(new Lugar("fermentacion"));
-        dataList.add(new Lugar("reposo"));
-        dataList.add(new Lugar("fuerza motriz"));
-        dataList.add(new Lugar("calderas"));
-        dataList.add(new Lugar("adjunto liquido"));
-        dataList.add(new Lugar("otro"));*/
 
-        //cemex
-        dataList.add(new Lugar("PD0665"));
-        dataList.add(new Lugar("PD0300"));
-        dataList.add(new Lugar("PD057"));
-        dataList.add(new Lugar("PD442"));
-        dataList.add(new Lugar("PD477"));
-        dataList.add(new Lugar("PD327"));
-        dataList.add(new Lugar("PD183"));
-        dataList.add(new Lugar("PD268"));
-        dataList.add(new Lugar("PD402"));
-        dataList.add(new Lugar("PD471"));
-        dataList.add(new Lugar("PD403"));
-        dataList.add(new Lugar("PD294"));
-        dataList.add(new Lugar("PD304"));
-        dataList.add(new Lugar("PD109"));
-        //
-        dataList.add(new Lugar("PD0056"));
-        dataList.add(new Lugar("PD0055"));
-        dataList.add(new Lugar("PD0057"));
-        dataList.add(new Lugar("PD0304"));
-        dataList.add(new Lugar("PD0665"));
-        dataList.add(new Lugar("PD0311"));
-        dataList.add(new Lugar("PD0442"));
-        dataList.add(new Lugar("PD0410"));
-        dataList.add(new Lugar("PD0300"));
-        dataList.add(new Lugar("PD0109"));
+        if (WorkServer.POSICION == 0) {
+            dataList.add(new Lugar("linea 10"));
+            dataList.add(new Lugar("linea 30"));
+            dataList.add(new Lugar("linea 40"));
+            dataList.add(new Lugar("linea 50"));
+            dataList.add(new Lugar("linea 60"));
+            dataList.add(new Lugar("refrigeracion"));
+            dataList.add(new Lugar("cocimientos"));
+            dataList.add(new Lugar("fermentacion"));
+            dataList.add(new Lugar("reposo"));
+            dataList.add(new Lugar("fuerza motriz"));
+            dataList.add(new Lugar("calderas"));
+            dataList.add(new Lugar("adjunto liquido"));
+            dataList.add(new Lugar("otro"));
+        }
 
+        if (WorkServer.POSICION == 1) {
+            //cemex
+            dataList.add(new Lugar("PD0665"));
+            dataList.add(new Lugar("PD0300"));
+            dataList.add(new Lugar("PD057"));
+            dataList.add(new Lugar("PD442"));
+            dataList.add(new Lugar("PD477"));
+            dataList.add(new Lugar("PD327"));
+            dataList.add(new Lugar("PD183"));
+            dataList.add(new Lugar("PD268"));
+            dataList.add(new Lugar("PD402"));
+            dataList.add(new Lugar("PD471"));
+            dataList.add(new Lugar("PD403"));
+            dataList.add(new Lugar("PD294"));
+            dataList.add(new Lugar("PD304"));
+            dataList.add(new Lugar("PD109"));
+            //
+            dataList.add(new Lugar("PD0056"));
+            dataList.add(new Lugar("PD0055"));
+            dataList.add(new Lugar("PD0057"));
+            dataList.add(new Lugar("PD0304"));
+            dataList.add(new Lugar("PD0665"));
+            dataList.add(new Lugar("PD0311"));
+            dataList.add(new Lugar("PD0442"));
+            dataList.add(new Lugar("PD0410"));
+            dataList.add(new Lugar("PD0300"));
+            dataList.add(new Lugar("PD0109"));
+        }
     }
 
     @Override

@@ -12,6 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import util.navigation.WorkServer;
 import util.navigation.modelos.Equipo;
 import util.navigation.modelos.InformacionFabricante;
 import util.navigation.modelos.ListaNombreEquipos;
@@ -22,25 +23,28 @@ import util.navigation.modelos.ListaNombreEquipos;
  */
 public interface RegisterAPI {
     //public static final String BASE_URL = "http://mantenimiento-contactres.rhcloud.com/MantenimientoRest/webresources/";
-    //public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
-    public static final String BASE_URL = "http://cemex-5266592.jl.serv.net.mx/rest/webresources/";
+    // public static final String BASE_URL = "http://env-5002349.jl.serv.net.mx/rest/webresources/";
+    //public static final String BASE_URL = "http://cemex-5266592.jl.serv.net.mx/rest/webresources/";
 
     public class Factory {
         private static RegisterAPI service;
 
         public static RegisterAPI getInstance() {
-            if (service == null) {
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(RegisterAPI.BASE_URL)
-                        .addConverterFactory(ScalarsConverterFactory.create())
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
+            // if (service == null) {
 
-                service = retrofit.create(RegisterAPI.class);
-                return service;
-            } else {
-                return service;
-            }
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    //.baseUrl(instance.getBASE_URL())
+                    .baseUrl(WorkServer.BASE_URL)
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            service = retrofit.create(RegisterAPI.class);
+            return service;
+            // } else {
+            //   return service;
+            //  }
         }
     }
 
