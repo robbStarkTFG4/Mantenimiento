@@ -39,6 +39,8 @@ public class CompresImagesLocal extends AsyncTask<Foto, Void, Boolean> {
 
             String ruta = foto.getArchivo();
             if (getFileSizeInMB(foto.getArchivo()) > 1) {
+                //BitmapFactory factory=new BitmapFactory();
+
                 Bitmap bit = BitmapFactory.decodeFile(ruta);
                 if (bit != null) {
                     try {

@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +82,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
         setContentView(R.layout.activity_order_mode);
         launchScanner();
         setUpDB();
-        pg=new ProgressDialog(this);
+        pg = new ProgressDialog(this);
     }
 
     @Override
@@ -96,6 +98,8 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
             master = new DaoMaster(db);
             session = master.newSession();
 
+            Log.d("INFO", "TAMAÑO: " + session.getLugarDBDao().loadAll().size());
+
         } catch (Exception e) {
             Log.d("d", e.getMessage());
         }
@@ -109,7 +113,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
 
     @Override
     public void barCodeResult(String code) {
-       this.codigo=code;
+        this.codigo = code;
     }
 
     @Override
@@ -123,7 +127,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
                 manager.beginTransaction().replace(R.id.content_order_mode, new ChooseLineFragment(), "place").addToBackStack(null).commit();
                 break;
             case "tipo":
-                manager.beginTransaction().replace(R.id.content_order_mode, OrdenFragment.newInstance(codigo,null)).addToBackStack(null).commit();
+                manager.beginTransaction().replace(R.id.content_order_mode, OrdenFragment.newInstance(codigo, null)).addToBackStack(null).commit();
                 break;
             case "servicio":
                 manager.beginTransaction().replace(R.id.content_order_mode, new TypeFragment()).addToBackStack(null).commit();
@@ -142,7 +146,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
                             List<HistorialDetalles> data = new ArrayList<HistorialDetalles>();
                             Modifier.convertToHistory(response.body(), data);
                             holder.setHistoryList(data);
-                            manager.beginTransaction().replace(R.id.content_order_mode, ServicioFragment.newInstance(holder, null),"serviNet").addToBackStack(null).commit();
+                            manager.beginTransaction().replace(R.id.content_order_mode, ServicioFragment.newInstance(holder, null), "serviNet").addToBackStack(null).commit();
                         } else {
                             dialog.dismiss();
                             Toast.makeText(OrderModeActivity.this, "hubo algun error", Toast.LENGTH_SHORT).show();
@@ -397,7 +401,7 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
 
     @Override
     public void itemPosition(int pos) {
-        currentPortablePos=pos;
+        currentPortablePos = pos;
     }
 
     @Override

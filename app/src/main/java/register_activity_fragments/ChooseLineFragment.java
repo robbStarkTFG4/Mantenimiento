@@ -1,24 +1,41 @@
 package register_activity_fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import mantenimiento.mim.com.mantenimiento.R;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import server.LugarAPI;
+import util.navigation.Modifier;
 import util.navigation.Navigator;
 import util.navigation.OnclickLink;
 import util.navigation.SerialListHolder;
 import util.navigation.WorkServer;
 import util.navigation.modelos.Lugar;
+
+import org.apache.commons.io.*;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +64,8 @@ public class ChooseLineFragment extends Fragment {
     private LineConsumer lineConsumer;
     private String nombre = null;
     private boolean control = false;
+    private ProgressDialog pg;
+
 
     public ChooseLineFragment() {
         // Required empty public constructor
@@ -83,6 +102,7 @@ public class ChooseLineFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        setHasOptionsMenu(true);
         dataSetUp();
         View view = inflater.inflate(R.layout.fragment_choose_line, container, false);
         widgetSetUp(view);
@@ -112,53 +132,134 @@ public class ChooseLineFragment extends Fragment {
     }
 
     private void dataSetUp() {
+
+        File file = null;
+        switch (WorkServer.POSICION) {
+            case 0:
+                file = new File(Environment.  //THIS WORKS
+                        getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                        "cerveceria.txt");
+                break;
+            case 1:
+                file = new File(Environment.  //THIS WORKS
+                        getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                        "concretos.txt");
+                break;
+        }
+
         dataList = new ArrayList<>();
-        //cerve
+        readList(file);
 
-        if (WorkServer.POSICION == 0) {
-            dataList.add(new Lugar("linea 10"));
-            dataList.add(new Lugar("linea 30"));
-            dataList.add(new Lugar("linea 40"));
-            dataList.add(new Lugar("linea 50"));
-            dataList.add(new Lugar("linea 60"));
-            dataList.add(new Lugar("refrigeracion"));
-            dataList.add(new Lugar("cocimientos"));
-            dataList.add(new Lugar("fermentacion"));
-            dataList.add(new Lugar("reposo"));
-            dataList.add(new Lugar("fuerza motriz"));
-            dataList.add(new Lugar("calderas"));
-            dataList.add(new Lugar("adjunto liquido"));
-            dataList.add(new Lugar("otro"));
-        }
+    }
 
-        if (WorkServer.POSICION == 1) {
-            //cemex
-            dataList.add(new Lugar("PD0665"));
-            dataList.add(new Lugar("PD0300"));
-            dataList.add(new Lugar("PD057"));
-            dataList.add(new Lugar("PD442"));
-            dataList.add(new Lugar("PD477"));
-            dataList.add(new Lugar("PD327"));
-            dataList.add(new Lugar("PD183"));
-            dataList.add(new Lugar("PD268"));
-            dataList.add(new Lugar("PD402"));
-            dataList.add(new Lugar("PD471"));
-            dataList.add(new Lugar("PD403"));
-            dataList.add(new Lugar("PD294"));
-            dataList.add(new Lugar("PD304"));
-            dataList.add(new Lugar("PD109"));
-            //
-            dataList.add(new Lugar("PD0056"));
-            dataList.add(new Lugar("PD0055"));
-            dataList.add(new Lugar("PD0057"));
-            dataList.add(new Lugar("PD0304"));
-            dataList.add(new Lugar("PD0665"));
-            dataList.add(new Lugar("PD0311"));
-            dataList.add(new Lugar("PD0442"));
-            dataList.add(new Lugar("PD0410"));
-            dataList.add(new Lugar("PD0300"));
-            dataList.add(new Lugar("PD0109"));
+    private void readList(File file) {
+        String content;
+        if (file.exists()) {
+            try {
+                //FileUtils.writeStringToFile(file, "porque?", "UTF-8");
+                content = FileUtils.readFileToString(file, "UTF-8");
+                if (content.length() > 0) {
+                    Gson gson = new Gson();
+
+
+                    Type listType = new TypeToken<List<Lugar>>() {
+                    }.getType();
+                    List<Lugar> lugaresList = gson.fromJson(content, listType);
+                    dataList.clear();
+                    dataList.addAll(lugaresList);
+
+                    //for (Lugar l : lugaresList) {
+                    //    Toast.makeText(ChooseLineFragment.this.getContext(), l.getNombre(), Toast.LENGTH_SHORT).show();
+                    //}
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                file.createNewFile();
+                syncList();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.choose_line_menu, menu);
+        Modifier.changeMenuItemColor(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.choose_line_sync:
+                Context context = ChooseLineFragment.this.getContext();
+                if (context != null) {
+                    pg = new ProgressDialog(context);
+                    pg.setMessage("espera un momento...");
+                    pg.setCanceledOnTouchOutside(false);
+                    pg.show();
+                    syncList();
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void syncList() {
+        LugarAPI.Factory.getInstance().getLugaresList().enqueue(new Callback<List<Lugar>>() {
+            @Override
+            public void onResponse(Call<List<Lugar>> call, Response<List<Lugar>> response) {
+                List<Lugar> body = response.body();
+                if (body != null) {
+
+                    Context context = ChooseLineFragment.this.getContext();
+                    if (context == null) {
+                        return;
+                    }
+                    pg.hide();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(body);
+                    File file = null;
+                    switch (WorkServer.POSICION) {
+                        case 0:
+                            file = new File(Environment.  //THIS WORKS
+                                    getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                                    "cerveceria.txt");
+                            break;
+                        case 1:
+                            file = new File(Environment.  //THIS WORKS
+                                    getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                                    "concretos.txt");
+                            break;
+                    }
+
+
+                    try {
+                        FileUtils.writeStringToFile(file, json, "UTF-8");
+                        //Toast.makeText(context, json, Toast.LENGTH_SHORT).show();
+                        dataList.clear();
+                        dataList.addAll(body);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Lugar>> call, Throwable throwable) {
+                Context context = ChooseLineFragment.this.getContext();
+                if (context == null) {
+                    return;
+                }
+                Toast.makeText(context, "hubo algun error", Toast.LENGTH_LONG).show();
+                pg.hide();
+            }
+        });
     }
 
     @Override

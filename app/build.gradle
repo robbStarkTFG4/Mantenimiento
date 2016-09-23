@@ -21,6 +21,7 @@ android {
 }
 
 dependencies {
+    compile "commons-io:commons-io:+"
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     // Version 23+ is required
