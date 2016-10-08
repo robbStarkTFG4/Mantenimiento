@@ -1,19 +1,29 @@
 package data_activity_fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import mantenimiento.mim.com.mantenimiento.R;
 
@@ -27,7 +37,6 @@ public class ImageViewFragment extends DialogFragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
 
 
     public ImageViewFragment() {
@@ -65,14 +74,80 @@ public class ImageViewFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_image_view, container, false);
+        final View view = inflater.inflate(R.layout.fragment_image_view, container, false);
         Toast.makeText(getContext(), "imagen: " + mParam1, Toast.LENGTH_LONG).show();
-        ImageView image = (ImageView) view.findViewById(R.id.img_fragment);
-        File fil = new File(mParam1);//
+
+        final ImageView image = (ImageView) view.findViewById(R.id.img_fragment);
+        final File fil = new File(mParam1);//
+
         Picasso.with(getContext()).load(fil).
                 // resize((int) (metrics.widthPixels)// fil as parameter
                 //         , (int) (150)) // instead of Uri was file path in ExpandableCustomAdp
                         into(image);
+
+        final Button btn = (Button) view.findViewById(R.id.rotate_btn);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Context context = ImageViewFragment.this.getContext();
+
+                if (context == null) {
+                    return;
+                }
+
+                Toast.makeText(context, "rotando... ", Toast.LENGTH_SHORT).show();
+                btn.setEnabled(false);
+                new AsyncTask<Void, Void, Boolean>() {
+
+                    @Override
+                    protected Boolean doInBackground(Void... params) {
+                        Bitmap bmp = BitmapFactory.decodeFile(mParam1);
+
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(90);
+                        bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true);
+
+                        FileOutputStream fOut;
+                        try {
+
+                            fOut = new FileOutputStream(fil);
+                            bmp.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+                            fOut.flush();
+                            fOut.close();
+                            Log.d("hola", "sadsadasdqw dasdasd as");
+
+
+                            return true;
+
+                        } catch (FileNotFoundException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                            return false;
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                            return false;
+                        }
+
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean aBoolean) {
+                        super.onPostExecute(aBoolean);
+                        btn.setEnabled(true);
+                        if (aBoolean) {
+                            Picasso picasso = Picasso.with(context);
+                            picasso.invalidate(fil);
+                            picasso.load(fil).into(image);
+                        }
+                    }
+                }.execute();
+
+
+            }
+        });
+
         return view;
     }
 

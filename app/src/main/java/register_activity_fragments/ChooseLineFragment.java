@@ -219,7 +219,10 @@ public class ChooseLineFragment extends Fragment {
                     if (context == null) {
                         return;
                     }
-                    pg.hide();
+
+                    if(pg!=null) {
+                        pg.hide();
+                    }
                     Gson gson = new Gson();
                     String json = gson.toJson(body);
                     File file = null;
@@ -257,7 +260,9 @@ public class ChooseLineFragment extends Fragment {
                     return;
                 }
                 Toast.makeText(context, "hubo algun error", Toast.LENGTH_LONG).show();
-                pg.hide();
+                if(pg!=null) {
+                    pg.hide();
+                }
             }
         });
     }
