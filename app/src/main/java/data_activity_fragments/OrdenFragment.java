@@ -114,7 +114,7 @@ public class OrdenFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (numeroOrden.getText().length() > 0 && encargado.getText().length() > 0
-                        && descripcion.getText().length() > 0 && actividad.getText().length() > 0
+                        && descripcion.getText().length() > 0 && !actividad.getText().equals("selecciona..")
                         && prioridad.getText().length() > 0) {
                     createOrden(numeroOrden.getText().toString(), descripcion.getText().toString(), encargado.getText().toString(), actividad.getText().toString(), prioridad.getText().toString());
                     mListener.navigate("servicio");

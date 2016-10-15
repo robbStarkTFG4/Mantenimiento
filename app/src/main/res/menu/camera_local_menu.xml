@@ -16,4 +16,9 @@
         android:title="borrrar seleccion"
         android:visible="false"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/camera_foto_multi_local"
+        android:title="multipe"
+        app:showAsAction="never" />
 </menu>

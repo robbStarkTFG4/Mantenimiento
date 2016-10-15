@@ -26,6 +26,7 @@
             android:layout_marginTop="20dp"
             android:scrollbars="vertical" />
         <android.support.design.widget.FloatingActionButton
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/fab_service_parameter_local"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

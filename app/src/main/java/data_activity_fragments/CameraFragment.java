@@ -2,6 +2,7 @@ package data_activity_fragments;
 
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +21,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,6 +58,7 @@ import util.navigation.modelos.Foto;
  */
 public class CameraFragment extends Fragment implements FotosAdapter.PositionConsumer {
     private final int SELECT_PHOTO = 199;
+    private final int SELECT_PHOTO_MULTI = 149;
     private boolean control = false;
 
     @Override
@@ -198,6 +201,9 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
             case R.id.camera_attach:
                 pickPhoto();
                 break;
+            case R.id.camera_foto_multi:
+                pickMultiple();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -207,6 +213,16 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         photoPickerIntent.setType("image/*");
         startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+
+    }
+
+    private void pickMultiple() {
+        control = false;
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PHOTO_MULTI);
 
     }
 
@@ -283,33 +299,7 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
                 if (resultCode == ((Activity) getContext()).RESULT_OK) {
                     try {
                         final Uri imageUri = data.getData();
-                        final InputStream imageStream = ((Activity) getContext()).getContentResolver().openInputStream(imageUri);
-                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-
-
-                        final File imageFile = createImageFile();
-
-                        new AsyncTask<Void, Void, Void>() {
-
-                            @Override
-                            protected Void doInBackground(Void... params) {
-                                try {
-                                    OutputStream stream = new FileOutputStream(imageFile);
-                                    selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                                    stream.flush();
-                                    stream.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Void aVoid) {
-                                super.onPostExecute(aVoid);
-                                notifyChange();
-                            }
-                        }.execute();
+                        final File imageFile = proccessImageFile(imageUri);
 
 
                         FotoDialogFragment foto = FotoDialogFragment.newInstance(null, null, 0);
@@ -323,7 +313,63 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
 
                 }
                 break;
+            case SELECT_PHOTO_MULTI:
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    if (data.getClipData() != null) {
+                        ClipData mClipData = data.getClipData();
+                        ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+                        for (int i = 0; i < mClipData.getItemCount(); i++) {
+
+                            ClipData.Item item = mClipData.getItemAt(i);
+                            Uri uri = item.getUri();
+                            mArrayUri.add(uri);
+                            try {
+                                final File imageFile = proccessImageFile(uri);
+                                ruta = imageFile.getPath();
+                                setPhotoInfo("modificar", "modificar",false);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            Toast.makeText(this.getContext(), uri.getPath(), Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }
+
+                break;
         }
+    }
+
+    private File proccessImageFile(Uri imageUri) throws IOException {
+        final InputStream imageStream = ((Activity) getContext()).getContentResolver().openInputStream(imageUri);
+        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+
+
+        final File imageFile = createImageFile();
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    OutputStream stream = new FileOutputStream(imageFile);
+                    selectedImage.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    stream.flush();
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                notifyChange();
+            }
+        }.execute();
+        return imageFile;
     }
 
     private void notifyChange() {
@@ -374,5 +420,14 @@ public class CameraFragment extends Fragment implements FotosAdapter.PositionCon
         mAdapter.notifyDataSetChanged();
         //}
     }
+    public void setPhotoInfo(String title, String descripcion,boolean call) {
+        Foto current = new Foto();
+        current.setArchivo(ruta);
+        current.setTitulo(title);
+        current.setDescripcion(descripcion);
+        dataList.add(current);
+        //if (control) {
 
+        //}
+    }
 }
