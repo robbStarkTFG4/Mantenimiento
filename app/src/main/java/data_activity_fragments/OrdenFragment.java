@@ -1,9 +1,11 @@
 package data_activity_fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import mantenimiento.mim.com.mantenimiento.R;
+import menu_inicio.MainMenuFragment;
 import util.navigation.Navigator;
+import util.navigation.WorkServer;
 import util.navigation.modelos.Orden;
 
 /**
@@ -35,6 +39,8 @@ public class OrdenFragment extends Fragment {
 
     private Navigator mListener;
     private OrdenConsumer orderConsumer;
+
+    private String[] activitiesList = {"mantenimiento", "electrico", "electromecanico", "soldadura", "aislamiento", "construccion", "otro"};
 
     public OrdenFragment() {
         // Required empty public constructor
@@ -84,7 +90,23 @@ public class OrdenFragment extends Fragment {
         }
         final EditText descripcion = (EditText) view.findViewById(R.id.descripcion_orden);
         final EditText encargado = (EditText) view.findViewById(R.id.encargado_orden);
-        final EditText actividad = (EditText) view.findViewById(R.id.actividad_orden);
+
+        final Button actividad = (Button) view.findViewById(R.id.actividad_orden);
+
+        actividad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Escoge actividad")
+                        .setItems(activitiesList, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                               actividad.setText(activitiesList[which]);
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+
         final EditText prioridad = (EditText) view.findViewById(R.id.prioridad_orden);
 
         Button btn = (Button) view.findViewById(R.id.siguiente_orden);

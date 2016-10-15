@@ -1,8 +1,10 @@
 package local_db_activity_fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +37,8 @@ public class OrdenInfoFragment extends Fragment {
 
     private Navigator mListener;
     private OrdenConsumer orderConsumer;
+
+    private String[] activitiesList = {"mantenimiento", "electrico", "electromecanico", "soldadura", "aislamiento", "construccion", "otro"};
 
     public OrdenInfoFragment() {
         // Required empty public constructor
@@ -81,7 +85,22 @@ public class OrdenInfoFragment extends Fragment {
         final EditText numeroOrden = (EditText) view.findViewById(R.id.numero_orden_loc);
         final EditText descripcion = (EditText) view.findViewById(R.id.descripcion_orden_local);
         final EditText encargado = (EditText) view.findViewById(R.id.encargado_orden_local);
-        final EditText actividad = (EditText) view.findViewById(R.id.actividad_orden_local);
+
+        final Button actividad = (Button) view.findViewById(R.id.actividad_orden_local);
+        actividad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Escoge actividad")
+                        .setItems(activitiesList, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                actividad.setText(activitiesList[which]);
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+
         final EditText prioridad = (EditText) view.findViewById(R.id.prioridad_orden_loc);
 
         Button btn = (Button) view.findViewById(R.id.siguiente_orden_local);

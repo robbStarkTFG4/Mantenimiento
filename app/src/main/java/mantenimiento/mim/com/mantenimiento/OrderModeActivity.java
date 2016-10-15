@@ -76,6 +76,8 @@ public class OrderModeActivity extends AppCompatActivity implements Navigator,
     private int currentPortablePos;
     private String codigo;
 
+    private String[] activitiesList = {"mantenimiento", "electrico", "electromecanico", "soldadura", "aislamiento", "construccion", "otro"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -71,7 +71,8 @@
                 android:text="actividad"
                 android:textSize="20dp" />
 
-            <EditText
+            <Button
+                android:text="seleccionar..."
                 android:id="@+id/actividad_orden_local"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

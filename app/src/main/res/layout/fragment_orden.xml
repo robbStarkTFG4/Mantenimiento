@@ -74,12 +74,13 @@
                 android:text="actividad"
                 android:textSize="20dp" />
 
-            <EditText
+            <Button
                 android:id="@+id/actividad_orden"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
-                android:inputType="text" />
+                android:layout_marginRight="9dp"
+                android:text="selecciona..." />
 
             <TextView
                 android:layout_width="wrap_content"
