@@ -10,6 +10,28 @@
         android:orientation="vertical"
         android:padding="7dp">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/down_btn_cell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/ic_arrow_downward_black_24dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/up_btn_cell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/down_btn_cell"
+                android:background="@drawable/ic_arrow_upward_black_24dp"
+                android:visibility="gone" />
+        </RelativeLayout>
+
         <ImageView
             android:id="@+id/imagen_cartita"
             android:layout_width="match_parent"

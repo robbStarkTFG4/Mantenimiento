@@ -300,6 +300,9 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
             case SELECT_PHOTO_MULTI:
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    if (data == null) {
+                        return;
+                    }
                     if (data.getClipData() != null) {
                         ClipData mClipData = data.getClipData();
                         ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
@@ -451,6 +454,32 @@ public class CameraLocalFragment extends Fragment implements FotosAdapter.Positi
             return true;
         } else {
             return false;
+        }
+    }
+
+    //change order of given object
+    @Override
+    public void changePosition(int position, boolean up) {
+        if (up) {
+            if ((position - 1) >= 0) {
+                FotoDB temp = new FotoDB();
+                Modifier.cloneFotoDB(temp, dataList.get(position));
+
+                Modifier.cloneFotoDB(dataList.get(position), dataList.get(position - 1));
+                Modifier.cloneFotoDB(dataList.get(position - 1), temp);
+                mAdapter.notifyDataSetChanged();
+            }
+
+        } else {
+
+            if ((position + 1) <= (dataList.size() - 1)) {
+                FotoDB temp = new FotoDB();
+                Modifier.cloneFotoDB(temp, dataList.get(position));
+
+                Modifier.cloneFotoDB(dataList.get(position), dataList.get(position + 1));
+                Modifier.cloneFotoDB(dataList.get(position + 1), temp);
+                mAdapter.notifyDataSetChanged();
+            }
         }
     }
 

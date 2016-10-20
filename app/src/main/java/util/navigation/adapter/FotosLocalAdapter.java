@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -31,6 +32,8 @@ import mantenimiento.mim.com.mantenimiento.R;
 import util.navigation.BlackBasket;
 import util.navigation.OnclickLink;
 import util.navigation.modelos.Foto;
+
+import static android.R.attr.button;
 
 /**
  * Created by marcoisaac on 5/11/2016.
@@ -78,6 +81,10 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
         private final ImageView image;
         private final BlackBasket basket;
 
+        private final CheckBox check;
+        private final Button btnUp;
+        private final Button btnDown;
+
         public CardView parent;
         private OnclickLink link;
 
@@ -92,7 +99,7 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
             title = (TextView) v.findViewById(R.id.description_corta);
             descripcion = (TextView) v.findViewById(R.id.description_larga);
             image = (ImageView) v.findViewById(R.id.imagen_cartita);
-            CheckBox check = (CheckBox) v.findViewById(R.id.check_cartas);
+            check = (CheckBox) v.findViewById(R.id.check_cartas);
 
             check.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -103,6 +110,25 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
                     } else {
                         basket.removeFromBlackList(getLayoutPosition());
                     }
+                }
+            });
+            ;
+            btnUp = (Button) v.findViewById(R.id.up_btn_cell);
+            btnUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "up", Toast.LENGTH_SHORT).show();
+                    basket.changePosition(getLayoutPosition(),true);
+
+                }
+            });
+
+            btnDown = (Button) v.findViewById(R.id.down_btn_cell);
+            btnDown.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "down", Toast.LENGTH_SHORT).show();
+                    basket.changePosition(getLayoutPosition(),false);
                 }
             });
         }
@@ -139,10 +165,16 @@ public class FotosLocalAdapter extends RecyclerView.Adapter<FotosLocalAdapter.Vi
 
 
         if (basket.getBoolean()) {
-            holder.parent.findViewById(R.id.check_cartas).setVisibility(View.VISIBLE);
+            holder.check.setVisibility(View.VISIBLE);
+            holder.btnUp.setVisibility(View.VISIBLE);
+            holder.btnDown.setVisibility(View.VISIBLE);
+            //holder.parent.findViewById(R.id.check_cartas).setVisibility(View.VISIBLE);
             //holder.check.setVisibility(View.VISIBLE);
         } else {
-            holder.parent.findViewById(R.id.check_cartas).setVisibility(View.GONE);
+            //holder.parent.findViewById(R.id.check_cartas).setVisibility(View.GONE);
+            holder.check.setVisibility(View.GONE);
+            holder.btnUp.setVisibility(View.GONE);
+            holder.btnDown.setVisibility(View.GONE);
         }
 
         if (basket.checkPosition(position)) {

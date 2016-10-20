@@ -15,4 +15,6 @@ public interface BlackBasket {
     public void showElementInfo(int layoutPosition);
 
     public boolean checkPosition(int position);
+
+    public void changePosition(int position,boolean up);
 }

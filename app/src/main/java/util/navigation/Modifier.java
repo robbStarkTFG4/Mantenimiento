@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import local_Db.FotoDB;
 import util.navigation.modelos.HistorialDetalles;
 import util.navigation.modelos.InformacionFabricante;
 
@@ -33,6 +34,14 @@ public class Modifier {
         for (int i = 0; i < body.size(); i++) {
             InformacionFabricante inf = body.get(i);
             dataList.add(new HistorialDetalles(inf.getParametro(), inf.getValor()));
+        }
+    }
+
+    public static void cloneFotoDB(FotoDB copy, FotoDB original) {
+        if (original != null) {
+            copy.setArchivo(original.getArchivo());
+            copy.setDescripcion(original.getDescripcion());
+            copy.setTitulo(original.getTitulo());
         }
     }
 }
